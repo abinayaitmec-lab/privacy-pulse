@@ -1,0 +1,8 @@
+flask
+groq
+requests
+beautifulsoup4
+html2text
+python-dotenv
+cloudscraper
+gunicorn

@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PrivacyPulse</title>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #080b14;
+    color: #e4e4e7;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    position: relative;
+    overflow-x: hidden;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 700px;
+    height: 700px;
+    background: radial-gradient(circle, rgba(34,197,94,0.04) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.dot-grid {
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);
+    background-size: 28px 28px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.wrapper {
+    width: 100%;
+    max-width: 500px;
+    position: relative;
+    z-index: 1;
+}
+
+.card {
+    background: linear-gradient(145deg, #12141f, #0e101a);
+    border-radius: 28px;
+    padding: 36px;
+    width: 100%;
+    box-shadow: 0 25px 60px -12px rgba(0,0,0,0.8);
+    border: 1px solid rgba(34,197,94,0.15);
+    position: relative;
+    z-index: 1;
+}
+
+.card-slim { padding: 32px 36px; }
+
+/* Brand */
+.brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 28px;
+}
+
+.brand-icon {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.brand-icon svg { width: 20px; height: 20px; color: #000; }
+
+.brand-text {
+    font-size: 20px;
+    font-weight: 800;
+    color: #e4e4e7;
+    letter-spacing: -0.5px;
+}
+
+h1 { font-size: 22px; text-align: center; margin-bottom: 4px; font-weight: 700; }
+
+.subtitle {
+    color: #71717a;
+    font-size: 13px;
+    text-align: center;
+    margin-bottom: 24px;
+    line-height: 1.5;
+}
+
+/* Input */
+.input-group {
+    display: flex;
+    gap: 8px;
+    position: relative;
+}
+
+.input-group input {
+    flex: 1;
+    padding: 14px 16px 14px 42px;
+    border: 2px solid #27272a;
+    border-radius: 12px;
+    background: #0a0d16;
+    color: #e4e4e7;
+    font-size: 14px;
+    outline: none;
+    transition: all .3s;
+}
+
+.input-group input:focus {
+    border-color: #22c55e;
+    box-shadow: 0 0 0 3px rgba(34,197,94,0.08);
+}
+
+.input-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #52525b;
+    pointer-events: none;
+    z-index: 1;
+    display: flex;
+}
+.input-icon svg {
+    width: 16px;
+    height: 16px;
+}
+
+.input-group input::placeholder { color: #52525b; }
+
+.input-group button {
+    padding: 14px 28px;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: #000;
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .25s;
+    white-space: nowrap;
+}
+
+.input-group button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 25px -8px rgba(34,197,94,0.4);
+}
+
+.input-group button:active { transform: translateY(0); }
+.input-group button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* Badge pills */
+.badges {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+}
+
+.badge-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #0a0d16;
+    border: 1px solid #1f2230;
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 11px;
+    color: #71717a;
+    white-space: nowrap;
+}
+
+.badge-pill svg { width: 12px; height: 12px; }
+
+/* Recent scans */
+.recent-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 16px;
+    font-size: 11px;
+    color: #52525b;
+    flex-wrap: wrap;
+}
+
+.recent-label { color: #52525b; }
+
+.recent-chip {
+    color: #63637a;
+    cursor: pointer;
+    transition: color .2s;
+    text-decoration: none;
+}
+
+.recent-chip:hover { color: #22c55e; }
+
+.recent-sep { color: #27272a; }
+
+/* Status */
+#status {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin: 24px 0;
+    color: #71717a;
+    font-size: 13px;
+}
+
+.loading-bar {
+    width: 200px;
+    height: 3px;
+    background: #1a1c28;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.loading-bar-fill {
+    height: 100%;
+    width: 30%;
+    background: linear-gradient(90deg, #22c55e, #4ade80);
+    border-radius: 2px;
+    animation: loadingSlide 1.2s ease-in-out infinite;
+}
+
+@keyframes loadingSlide {
+    0% { transform: translateX(-100%); width: 30%; }
+    50% { width: 60%; }
+    100% { transform: translateX(400%); width: 30%; }
+}
+
+/* Error */
+#error {
+    display: none;
+    background: rgba(239,68,68,0.08);
+    color: #fca5a5;
+    padding: 14px 16px;
+    border-radius: 12px;
+    margin: 16px 0;
+    font-size: 13px;
+    text-align: center;
+    border: 1px solid rgba(239,68,68,0.15);
+}
+
+/* Popular sites */
+.popular-section { margin-top: 32px; }
+.popular-title { font-size: 15px; font-weight: 700; color: #e4e4e7; margin-bottom: 4px; text-align: center; }
+.popular-subtitle { font-size: 12px; color: #52525b; margin-bottom: 20px; text-align: center; }
+.popular-grid { display: flex; gap: 24px; }
+.popular-card {
+    flex: 1;
+    min-height: 220px;
+    background: #0e111c;
+    border: 1px solid #27272a;
+    border-left: 4px solid #27272a;
+    border-radius: 14px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all .25s;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.popular-card:hover { transform: scale(1.03); }
+.popular-card-top { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+.popular-card-favicon { width: 20px; height: 20px; border-radius: 4px; }
+.popular-card-name { font-size: 14px; font-weight: 700; color: #e4e4e7; }
+.popular-card-middle { flex: 1; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+.popular-card-ring {
+    width: 104px;
+    height: 104px;
+    border-radius: 50%;
+    border: 3px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.popular-card-score { font-size: 48px; font-weight: 800; line-height: 1; }
+.popular-card-bottom { text-align: center; }
+.popular-card-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 4px;
+}
+.popular-card-desc { font-size: 11px; color: #63637a; line-height: 1.4; }
+
+/* Empty state */
+.empty-state { text-align: center; padding: 32px 20px; color: #52525b; font-size: 14px; }
+
+/* Scorecard */
+.scorecard-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #1a1c28;
+}
+
+.scorecard-brand {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.scorecard-brand svg { width: 16px; height: 16px; color: #22c55e; }
+.scorecard-brand-text { font-size: 12px; font-weight: 700; color: #22c55e; letter-spacing: 0.5px; }
+
+.scorecard-site-area {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.site-name { font-size: 16px; font-weight: 700; }
+
+.grade-badge {
+    font-size: 10px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 5px;
+    color: #000;
+    letter-spacing: 0.5px;
+}
+
+.score-section { text-align: center; margin-bottom: 28px; }
+
+.score-ring {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+}
+
+.score-ring svg { transform: rotate(-90deg); width: 110px; height: 110px; }
+.score-ring-bg { fill: none; stroke: #1a1c28; stroke-width: 5; }
+.score-ring-fill { fill: none; stroke-width: 5; stroke-linecap: round; transition: stroke-dashoffset 1s ease, stroke .5s; }
+
+.score-number {
+    position: absolute;
+    font-size: 32px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.score-label {
+    color: #63637a;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+.verdict-line { color: #a1a1aa; font-size: 14px; margin-top: 6px; }
+
+.categories { display: flex; flex-direction: column; gap: 18px; margin-bottom: 28px; }
+.category-row { display: flex; flex-direction: column; gap: 5px; }
+.category-header { display: flex; justify-content: space-between; align-items: center; }
+.category-name { font-size: 13px; font-weight: 600; color: #d4d4d8; }
+.category-score { font-size: 13px; font-weight: 700; }
+
+.bar-track {
+    width: 100%;
+    height: 8px;
+    background: #1a1c28;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+}
+
+.bar-fill::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 20px;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15));
+    border-radius: 4px;
+}
+
+.bar-explanation { color: #63637a; font-size: 12px; line-height: 1.4; }
+
+.verdict-box {
+    background: linear-gradient(135deg, #161824, #1a1c28);
+    border-radius: 14px;
+    padding: 18px;
+    text-align: center;
+    margin-bottom: 24px;
+    border: 1px solid rgba(34,197,94,0.1);
+}
+
+.verdict-emoji { display: block; margin-bottom: 6px; }
+.verdict-emoji svg { width: 28px; height: 28px; }
+
+.verdict-text { font-size: 15px; font-weight: 700; color: #e4e4e7; }
+
+.bottom-row { display: flex; justify-content: space-between; }
+
+.share-btn, .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: 1px solid #27272a;
+    color: #63637a;
+    padding: 10px 22px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .25s;
+}
+
+.share-btn:hover, .back-btn:hover {
+    border-color: #22c55e;
+    color: #22c55e;
+    background: rgba(34,197,94,0.04);
+}
+
+.share-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.back-btn:hover { border-color: #63637a; color: #a1a1aa; background: transparent; }
+
+/* Footer */
+.footer {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 11px;
+    color: #3f3f50;
+    padding-bottom: 20px;
+}
+
+/* Entrance animation */
+@keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.92) translateY(12px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.card-entrance {
+    animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@media (max-width: 540px) {
+    body { padding: 16px 12px; }
+    .card, .card-slim { padding: 20px; border-radius: 20px; }
+    .wrapper { max-width: 100%; }
+
+    .brand { margin-bottom: 20px; }
+    .brand-icon { width: 30px; height: 30px; }
+    .brand-icon svg { width: 16px; height: 16px; }
+    .brand-text { font-size: 17px; }
+
+    h1 { font-size: 18px; }
+    .subtitle { font-size: 12px; margin-bottom: 18px; }
+
+    .input-group input { padding: 12px 14px 12px 38px; font-size: 13px; }
+    .input-group button { padding: 12px 20px; font-size: 13px; }
+
+    #status { margin: 18px 0; font-size: 12px; }
+    .loading-bar { width: 140px; }
+
+    .badges { gap: 6px; margin-top: 12px; }
+    .badge-pill { font-size: 10px; padding: 4px 10px; }
+
+    .recent-row { font-size: 10px; gap: 4px; }
+
+    .scorecard-header { flex-wrap: wrap; gap: 8px; padding-bottom: 16px; margin-bottom: 20px; }
+    .scorecard-site-area { margin-left: 0; }
+
+    .popular-grid { flex-direction: column; }
+
+    .score-ring svg { width: 90px; height: 90px; }
+    .score-number { font-size: 26px; }
+
+    .categories { gap: 14px; margin-bottom: 22px; }
+    .category-name { font-size: 12px; }
+    .category-score { font-size: 12px; }
+    .bar-track { height: 7px; }
+    .bar-explanation { font-size: 11px; }
+
+    .verdict-box { padding: 14px; }
+    .verdict-text { font-size: 14px; }
+    .verdict-emoji svg { width: 24px; height: 24px; }
+
+    .share-btn, .back-btn { padding: 8px 16px; font-size: 12px; }
+
+    .footer { font-size: 10px; margin-top: 18px; }
+}
+
+@media (max-width: 380px) {
+    body { padding: 12px 8px; }
+    .card, .card-slim { padding: 16px; border-radius: 16px; }
+
+    .brand-icon { width: 26px; height: 26px; }
+    .brand-icon svg { width: 14px; height: 14px; }
+    .brand-text { font-size: 15px; }
+
+    h1 { font-size: 16px; }
+    .subtitle { font-size: 11px; }
+
+    .input-group { flex-direction: column; }
+    .input-group input { padding: 12px 14px 12px 38px; }
+    .input-group button { width: 100%; }
+
+    .score-ring svg { width: 76px; height: 76px; }
+    .score-number { font-size: 22px; }
+    .score-label { font-size: 10px; }
+
+    .badge-pill { font-size: 9px; padding: 3px 8px; }
+    .recent-row { font-size: 9px; }
+
+    .categories { gap: 12px; }
+    .bar-track { height: 6px; }
+}
+
+@media (min-width: 768px) {
+    body { padding: 60px 40px; }
+}
+</style>
+</head>
+<body>
+<div class="dot-grid"></div>
+
+<div class="wrapper">
+    <div class="card card-slim" id="inputCard">
+        <div class="brand">
+            <div class="brand-icon" data-lucide="shield"></div>
+            <span class="brand-text">PrivacyPulse</span>
+        </div>
+        <h1>Check any site's privacy</h1>
+        <p class="subtitle">Paste any URL. Get a plain English privacy score in seconds. No jargon.</p>
+
+        <div class="input-group">
+            <span class="input-icon" data-lucide="search"></span>
+            <input type="text" id="urlInput" placeholder="example.com" autofocus>
+            <button id="scanBtn" onclick="scan()">Scan</button>
+        </div>
+
+        <div id="status">
+            <div class="loading-bar"><div class="loading-bar-fill"></div></div>
+            <span>Scanning privacy policy...</span>
+        </div>
+
+        <div id="error">
+            <div id="errorUrl" style="color:#52525b;font-size:11px;margin-bottom:4px"></div>
+            <div id="errorMsg"></div>
+        </div>
+
+        <div class="badges">
+            <span class="badge-pill"><span data-lucide="search" style="width:12px;height:12px;color:#22c55e"></span> 10,000+ Sites Scanned</span>
+            <span class="badge-pill"><span data-lucide="shield" style="width:12px;height:12px;color:#22c55e"></span> Free Forever</span>
+            <span class="badge-pill"><span data-lucide="zap" style="width:12px;height:12px;color:#22c55e"></span> Results in 5s</span>
+        </div>
+
+        <div class="recent-row">
+            <span class="recent-label">Recently checked:</span>
+            <a class="recent-chip" onclick="fillUrl('facebook.com')">facebook.com</a>
+            <span class="recent-sep">&bull;</span>
+            <a class="recent-chip" onclick="fillUrl('zomato.com')">zomato.com</a>
+            <span class="recent-sep">&bull;</span>
+            <a class="recent-chip" onclick="fillUrl('google.com')">google.com</a>
+            <span class="recent-sep">&bull;</span>
+            <a class="recent-chip" onclick="fillUrl('signal.org')">signal.org</a>
+        </div>
+
+        <div class="empty-state" id="emptyState">
+            <span id="emptyUrl" style="color:#52525b;font-size:11px;display:block;margin-bottom:4px"></span>
+            Enter a URL above to see its privacy score
+        </div>
+    </div>
+
+    <div class="popular-section">
+        <div class="popular-title">Popular Sites Privacy Scores</div>
+        <div class="popular-subtitle">See how the sites you use every day score on privacy</div>
+        <div class="popular-grid">
+            <div class="popular-card" onclick="fillUrl('signal.org')" style="border-left-color:#22c55e;box-shadow:0 0 0 0 transparent" onmouseover="this.style.boxShadow='0 0 24px -4px rgba(34,197,94,0.25)'" onmouseout="this.style.boxShadow='0 0 0 0 transparent'">
+                <div class="popular-card-top">
+                    <img class="popular-card-favicon" src="https://www.google.com/s2/favicons?domain=signal.org&sz=32" alt="">
+                    <div class="popular-card-name">signal.org</div>
+                </div>
+                <div class="popular-card-middle">
+                    <div class="popular-card-ring" style="border-color:#22c55e">
+                        <div class="popular-card-score" style="color:#22c55e">9</div>
+                    </div>
+                </div>
+                <div class="popular-card-bottom">
+                    <div class="popular-card-badge" style="background:#22c55e18;color:#22c55e">🟢 Privacy Safe</div>
+                    <div class="popular-card-desc">No tracking. Your data stays yours.</div>
+                </div>
+            </div>
+            <div class="popular-card" onclick="fillUrl('zomato.com')" style="border-left-color:#eab308;box-shadow:0 0 0 0 transparent" onmouseover="this.style.boxShadow='0 0 24px -4px rgba(234,179,8,0.25)'" onmouseout="this.style.boxShadow='0 0 0 0 transparent'">
+                <div class="popular-card-top">
+                    <img class="popular-card-favicon" src="https://www.google.com/s2/favicons?domain=zomato.com&sz=32" alt="">
+                    <div class="popular-card-name">zomato.com</div>
+                </div>
+                <div class="popular-card-middle">
+                    <div class="popular-card-ring" style="border-color:#eab308">
+                        <div class="popular-card-score" style="color:#eab308">5</div>
+                    </div>
+                </div>
+                <div class="popular-card-bottom">
+                    <div class="popular-card-badge" style="background:#eab30818;color:#eab308">🟡 Use Caution</div>
+                    <div class="popular-card-desc">Shares order data and location with partners.</div>
+                </div>
+            </div>
+            <div class="popular-card" onclick="fillUrl('facebook.com')" style="border-left-color:#ef4444;box-shadow:0 0 0 0 transparent" onmouseover="this.style.boxShadow='0 0 24px -4px rgba(239,68,68,0.25)'" onmouseout="this.style.boxShadow='0 0 0 0 transparent'">
+                <div class="popular-card-top">
+                    <img class="popular-card-favicon" src="https://www.google.com/s2/favicons?domain=facebook.com&sz=32" alt="">
+                    <div class="popular-card-name">facebook.com</div>
+                </div>
+                <div class="popular-card-middle">
+                    <div class="popular-card-ring" style="border-color:#ef4444">
+                        <div class="popular-card-score" style="color:#ef4444">2</div>
+                    </div>
+                </div>
+                <div class="popular-card-bottom">
+                    <div class="popular-card-badge" style="background:#ef444418;color:#ef4444">🔴 High Risk</div>
+                    <div class="popular-card-desc">Extensive tracking and data sharing with third parties.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" id="scorecard" style="display:none">
+        <div id="captureArea">
+            <div class="scorecard-header">
+                <div class="scorecard-brand">
+                    <span data-lucide="shield" style="width:16px;height:16px;color:#eab308"></span>
+                    <span class="scorecard-brand-text">PRIVACYPULSE</span>
+                </div>
+                <div class="scorecard-site-area">
+                    <span class="site-name" id="siteName"></span>
+                    <span class="grade-badge" id="gradeBadge"></span>
+                    <span id="knownLabel" style="display:none;font-size:10px;color:#52525b;background:#1a1c28;padding:2px 8px;border-radius:4px;margin-left:6px">Known data</span>
+                    <span id="estLabel" style="display:none;font-size:10px;color:#a3a300;background:#1a1c28;padding:2px 8px;border-radius:4px;margin-left:6px">Estimated</span>
+                </div>
+            </div>
+            <div class="score-section">
+                <div class="score-ring">
+                    <svg viewBox="0 0 120 120">
+                        <circle class="score-ring-bg" cx="60" cy="60" r="50"/>
+                        <circle class="score-ring-fill" id="scoreRing" cx="60" cy="60" r="50" stroke-dasharray="314.16" stroke-dashoffset="314.16"/>
+                    </svg>
+                    <span class="score-number" id="overallScore"></span>
+                </div>
+                <div class="score-label">Privacy Score</div>
+                <div class="verdict-line" id="verdictLine"></div>
+            </div>
+            <div class="categories" id="categories"></div>
+            <div class="verdict-box">
+                <span class="verdict-emoji" id="verdictEmoji"></span>
+                <span class="verdict-text" id="verdictText"></span>
+            </div>
+        </div>
+        <div class="bottom-row">
+            <button class="back-btn" onclick="goBack()">
+                <span data-lucide="arrow-left" style="width:14px;height:14px"></span> Back
+            </button>
+            <button class="share-btn" onclick="shareScore()">
+                <span data-lucide="share-2" style="width:14px;height:14px"></span> Share Score
+            </button>
+        </div>
+    </div>
+
+    <div class="footer">PrivacyPulse &mdash; Free privacy checker. Not affiliated with any website we scan.</div>
+</div>
+
+<script>
+function scoreColor(n) {
+    if (n <= 4) return "#ef4444";
+    if (n <= 7) return "#eab308";
+    return "#22c55e";
+}
+
+const catLabels = {
+    data_collection: "Data Collection",
+    data_sharing: "Data Sharing",
+    user_rights: "Your Rights",
+    tracking: "Tracking",
+    clarity: "Clarity"
+};
+
+function fillUrl(url) {
+    document.getElementById("urlInput").value = url;
+    scan();
+}
+
+async function scan() {
+    const raw = document.getElementById("urlInput").value.trim();
+    if (!raw) return;
+
+    const imgExts = [".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp", ".svg", ".ico"];
+    if (imgExts.some(e => raw.toLowerCase().endsWith(e))) {
+        showError("image.png", "That's an image file, not a website. Please enter a normal URL like example.com");
+        return;
+    }
+
+    const btn = document.getElementById("scanBtn");
+    const status = document.getElementById("status");
+    const error = document.getElementById("error");
+    const inputCard = document.getElementById("inputCard");
+    const scorecard = document.getElementById("scorecard");
+    const empty = document.getElementById("emptyState");
+    const popular = document.querySelector(".popular-section");
+
+    btn.disabled = true;
+    status.style.display = "flex";
+    error.style.display = "none";
+    scorecard.style.display = "none";
+    scorecard.classList.remove("card-entrance");
+    empty.style.display = "none";
+    if (popular) popular.style.display = "none";
+
+    try {
+        const res = await fetch("/scan", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url: raw })
+        });
+        const data = await res.json();
+
+        if (data.error) {
+            showError(data.clean_domain || raw, data.error);
+            return;
+        }
+
+        renderScorecard(data.scorecard);
+    } catch (e) {
+        showError(raw, "Something went wrong. Try again.");
+    } finally {
+        btn.disabled = false;
+        status.style.display = "none";
+    }
+}
+
+function showError(domain, msg) {
+    const error = document.getElementById("error");
+    const empty = document.getElementById("emptyState");
+    const urlDisplay = document.getElementById("errorUrl");
+    const msgDisplay = document.getElementById("errorMsg");
+    const emptyUrl = document.getElementById("emptyUrl");
+    const popular = document.querySelector(".popular-section");
+    const searched = domain ? "Searched: " + domain : "";
+    urlDisplay.textContent = searched;
+    emptyUrl.textContent = searched;
+    msgDisplay.textContent = msg;
+    error.style.display = "block";
+    empty.style.display = "block";
+    if (popular) popular.style.display = "";
+}
+
+function renderScorecard(s) {
+    document.getElementById("siteName").textContent = s.site_name || "Unknown";
+    const badge = document.getElementById("gradeBadge");
+    badge.textContent = s.grade || "N/A";
+    badge.style.background = scoreColor(s.overall_score || 0);
+
+    document.getElementById("knownLabel").style.display = s.known ? "inline" : "none";
+    document.getElementById("estLabel").style.display = s.estimated ? "inline" : "none";
+
+    const os = s.overall_score || 0;
+    const color = scoreColor(os);
+    const scoreEl = document.getElementById("overallScore");
+    scoreEl.textContent = os + "/10";
+    scoreEl.style.color = color;
+
+    document.getElementById("verdictLine").textContent = s.verdict || "";
+
+    const ring = document.getElementById("scoreRing");
+    const circumference = 314.16;
+    const offset = circumference - (os / 10) * circumference;
+    ring.style.stroke = color;
+    setTimeout(() => ring.style.strokeDashoffset = offset, 100);
+
+    const cats = s.categories || {};
+    const container = document.getElementById("categories");
+    container.innerHTML = "";
+
+    for (const [key, val] of Object.entries(catLabels)) {
+        const c = cats[key] || { score: 0, explanation: "" };
+        const sc = c.score || 0;
+        const catColor = scoreColor(sc);
+        const row = document.createElement("div");
+        row.className = "category-row";
+        row.style.opacity = "0";
+        row.style.transform = "translateY(8px)";
+        row.innerHTML = `
+            <div class="category-header">
+                <span class="category-name">${val}</span>
+                <span class="category-score" style="color:${catColor}">${sc}/10</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width:0%;background:${catColor}"></div></div>
+            <div class="bar-explanation">${c.explanation || ""}</div>
+        `;
+        container.appendChild(row);
+    }
+
+    const iconName = os > 6 ? 'shield-check' : os > 3 ? 'alert-triangle' : 'ban';
+    document.getElementById("verdictEmoji").innerHTML = `<i data-lucide="${iconName}" style="width:28px;height:28px;color:${color}"></i>`;
+    document.getElementById("verdictText").textContent = s.verdict || "";
+    if (window.lucide) lucide.createIcons();
+
+    inputCard.style.display = "none";
+    scorecard.style.display = "block";
+    scorecard.classList.add("card-entrance");
+
+    setTimeout(() => {
+        document.querySelectorAll(".category-row").forEach((row, i) => {
+            setTimeout(() => {
+                row.style.transition = "all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)";
+                row.style.opacity = "1";
+                row.style.transform = "translateY(0)";
+                const fill = row.querySelector(".bar-fill");
+                const key = Object.keys(catLabels)[i];
+                const sc = (s.categories && s.categories[key] && s.categories[key].score) || 0;
+                fill.style.width = (sc * 10) + "%";
+            }, i * 100);
+        });
+    }, 200);
+}
+
+function shareScore() {
+    const btn = document.querySelector(".share-btn");
+    btn.textContent = "Generating...";
+    btn.disabled = true;
+
+    html2canvas(document.getElementById("captureArea"), {
+        background: "#12141f",
+        scale: 2,
+        useCORS: true,
+        logging: false
+    }).then(canvas => {
+        canvas.toBlob(blob => {
+            const file = new File([blob], "privacy-scorecard.png", { type: "image/png" });
+            if (navigator.share && navigator.canShare({ files: [file] })) {
+                navigator.share({ files: [file], title: "Privacy Score" });
+            } else {
+                const a = document.createElement("a");
+                a.href = URL.createObjectURL(blob);
+                a.download = "privacy-scorecard.png";
+                a.click();
+                URL.revokeObjectURL(a.href);
+            }
+            btn.innerHTML = '<span data-lucide="share-2" style="width:14px;height:14px"></span> Share Score';
+            if (window.lucide) lucide.createIcons();
+            btn.disabled = false;
+        });
+    }).catch(() => {
+        btn.innerHTML = '<span data-lucide="share-2" style="width:14px;height:14px"></span> Share Score';
+        if (window.lucide) lucide.createIcons();
+        btn.disabled = false;
+    });
+}
+
+function goBack() {
+    location.reload();
+}
+
+document.getElementById("urlInput").addEventListener("keydown", e => {
+    if (e.key === "Enter") scan();
+});
+
+if (window.lucide) lucide.createIcons();
+</script>
+</body>
+</html>
