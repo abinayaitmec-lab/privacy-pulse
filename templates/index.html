@@ -418,8 +418,7 @@ h1 { font-size: 22px; text-align: center; margin-bottom: 4px; font-weight: 700; 
     border: 1px solid rgba(34,197,94,0.1);
 }
 
-.verdict-emoji { display: block; margin-bottom: 6px; }
-.verdict-emoji svg { width: 28px; height: 28px; }
+.verdict-emoji { display: block; margin-bottom: 6px; font-size: 28px; line-height: 1; }
 
 .verdict-text { font-size: 15px; font-weight: 700; color: #e4e4e7; }
 
@@ -508,7 +507,7 @@ h1 { font-size: 22px; text-align: center; margin-bottom: 4px; font-weight: 700; 
 
     .verdict-box { padding: 14px; }
     .verdict-text { font-size: 14px; }
-    .verdict-emoji svg { width: 24px; height: 24px; }
+    .verdict-emoji { font-size: 24px; }
 
     .share-btn, .back-btn { padding: 8px 16px; font-size: 12px; }
 
@@ -653,7 +652,7 @@ h1 { font-size: 22px; text-align: center; margin-bottom: 4px; font-weight: 700; 
         <div id="captureArea">
             <div class="scorecard-header">
                 <div class="scorecard-brand">
-                    <span data-lucide="shield" style="width:16px;height:16px;color:#eab308"></span>
+                    <span style="font-size:18px">🛡️</span>
                     <span class="scorecard-brand-text">PRIVACYPULSE</span>
                 </div>
                 <div class="scorecard-site-area">
@@ -823,10 +822,10 @@ function renderScorecard(s) {
         container.appendChild(row);
     }
 
-    const iconName = os > 6 ? 'shield-check' : os > 3 ? 'alert-triangle' : 'ban';
-    document.getElementById("verdictEmoji").innerHTML = `<i data-lucide="${iconName}" style="width:28px;height:28px;color:${color}"></i>`;
+    const iconEmoji = os > 6 ? '✅' : os > 3 ? '⚠️' : '🔴';
+    document.getElementById("verdictEmoji").textContent = iconEmoji;
+    document.getElementById("verdictEmoji").style.fontSize = "28px";
     document.getElementById("verdictText").textContent = s.verdict || "";
-    if (window.lucide) lucide.createIcons();
 
     inputCard.style.display = "none";
     scorecard.style.display = "block";
@@ -856,10 +855,7 @@ function shareScore() {
         background: "#12141f",
         scale: 3,
         logging: false,
-        letterRendering: true,
-        onclone: function(doc) {
-            doc.querySelectorAll("[data-lucide]").forEach(el => el.removeAttribute("data-lucide"));
-        }
+        letterRendering: true
     }).then(canvas => {
         canvas.toBlob(blob => {
             const file = new File([blob], "privacy-scorecard.png", { type: "image/png" });
