@@ -659,7 +659,6 @@ h1 { font-size: 22px; text-align: center; margin-bottom: 4px; font-weight: 700; 
                     <span class="site-name" id="siteName"></span>
                     <span class="grade-badge" id="gradeBadge"></span>
                     <span id="knownLabel" style="display:none;font-size:10px;color:#52525b;background:#1a1c28;padding:2px 8px;border-radius:4px;margin-left:6px">Known data</span>
-                    <span id="estLabel" style="display:none;font-size:10px;color:#a3a300;background:#1a1c28;padding:2px 8px;border-radius:4px;margin-left:6px">Estimated</span>
                 </div>
             </div>
             <div class="score-section">
@@ -827,7 +826,7 @@ function renderScorecard(s) {
     badge.style.background = scoreColor(s.overall_score || 0);
 
     document.getElementById("knownLabel").style.display = s.known ? "inline" : "none";
-    document.getElementById("estLabel").style.display = s.estimated ? "inline" : "none";
+
 
     const os = s.overall_score || 0;
     const color = scoreColor(os);
