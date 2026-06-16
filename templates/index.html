@@ -851,12 +851,30 @@ function shareScore() {
     btn.textContent = "Generating...";
     btn.disabled = true;
 
-    html2canvas(document.getElementById("captureArea"), {
-        background: "#12141f",
+    // Clone the scorecard into a dark-themed offscreen container
+    const original = document.getElementById("captureArea");
+    const clone = original.cloneNode(true);
+    clone.style.background = "#12141f";
+    clone.style.borderRadius = "16px";
+    clone.style.padding = "24px";
+    clone.style.width = original.offsetWidth + "px";
+
+    const wrapper = document.createElement("div");
+    wrapper.style.position = "fixed";
+    wrapper.style.left = "-9999px";
+    wrapper.style.top = "0";
+    wrapper.style.background = "#0d0d0d";
+    wrapper.style.padding = "40px";
+    wrapper.appendChild(clone);
+    document.body.appendChild(wrapper);
+
+    html2canvas(clone, {
+        background: "#0d0d0d",
         scale: 3,
         logging: false,
         letterRendering: true
     }).then(canvas => {
+        wrapper.remove();
         canvas.toBlob(blob => {
             const file = new File([blob], "privacy-scorecard.png", { type: "image/png" });
             if (navigator.share && navigator.canShare({ files: [file] })) {
@@ -873,6 +891,7 @@ function shareScore() {
             btn.disabled = false;
         });
     }).catch(() => {
+        wrapper.remove();
         btn.innerHTML = '<span data-lucide="share-2" style="width:14px;height:14px"></span> Share Score';
         if (window.lucide) lucide.createIcons();
         btn.disabled = false;
