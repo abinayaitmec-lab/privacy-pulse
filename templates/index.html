@@ -776,6 +776,50 @@ function showError(domain, msg) {
     if (popular) popular.style.display = "";
 }
 
+function getCategoryDescription(category, score) {
+    const descriptions = {
+        data_collection: [
+            { min: 9, max: 10, text: "Collects almost nothing — only essential account info" },
+            { min: 7, max: 8, text: "Collects basic data like name and email only" },
+            { min: 5, max: 6, text: "Collects moderate data including usage and device info" },
+            { min: 2, max: 4, text: "Collects extensive data including location and behavior" },
+            { min: 0, max: 1, text: "Collects everything — location, contacts, behavior, browsing history" }
+        ],
+        data_sharing: [
+            { min: 9, max: 10, text: "Never sells or shares your data with anyone" },
+            { min: 7, max: 8, text: "Minimal sharing — only with essential service providers" },
+            { min: 5, max: 6, text: "Shares some data with third party services and partners" },
+            { min: 2, max: 4, text: "Regularly shares data with advertisers and data brokers" },
+            { min: 0, max: 1, text: "Sells your data to anyone willing to pay" }
+        ],
+        user_rights: [
+            { min: 9, max: 10, text: "Full control — access, export and delete your data anytime" },
+            { min: 7, max: 8, text: "Good rights — most requests honored quickly" },
+            { min: 5, max: 6, text: "Basic rights available but some limitations apply" },
+            { min: 2, max: 4, text: "Limited control — hard to delete or export your data" },
+            { min: 0, max: 1, text: "Almost no control over your personal data" }
+        ],
+        tracking: [
+            { min: 9, max: 10, text: "Zero tracking — no cookies, no fingerprinting, no cross-site tracking" },
+            { min: 7, max: 8, text: "Minimal tracking — basic analytics only" },
+            { min: 5, max: 6, text: "Some tracking cookies and third party analytics in use" },
+            { min: 2, max: 4, text: "Heavy tracking across multiple platforms and devices" },
+            { min: 0, max: 1, text: "Extreme tracking — monitors everything you do online" }
+        ],
+        clarity: [
+            { min: 9, max: 10, text: "Policy is short, plain English and easy to understand" },
+            { min: 7, max: 8, text: "Clear policy with only minor technical terms" },
+            { min: 5, max: 6, text: "Readable but contains some legal and technical language" },
+            { min: 2, max: 4, text: "Long and confusing — written for lawyers not users" },
+            { min: 0, max: 1, text: "Impossible to understand — deliberately vague and misleading" }
+        ]
+    };
+    const ranges = descriptions[category];
+    if (!ranges) return "No description available";
+    const match = ranges.find(r => score >= r.min && score <= r.max);
+    return match ? match.text : "No description available";
+}
+
 function renderScorecard(s) {
     document.getElementById("siteName").textContent = s.site_name || "Unknown";
     const badge = document.getElementById("gradeBadge");
@@ -817,7 +861,7 @@ function renderScorecard(s) {
                 <span class="category-score" style="color:${catColor}">${sc}/10</span>
             </div>
             <div class="bar-track"><div class="bar-fill" style="width:0%;background:${catColor}"></div></div>
-            <div class="bar-explanation">${c.explanation || ""}</div>
+            <div class="bar-explanation">${getCategoryDescription(key, sc)}</div>
         `;
         container.appendChild(row);
     }
