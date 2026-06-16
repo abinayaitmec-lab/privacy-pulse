@@ -854,9 +854,12 @@ function shareScore() {
 
     html2canvas(document.getElementById("captureArea"), {
         background: "#12141f",
-        scale: 2,
-        useCORS: true,
-        logging: false
+        scale: 3,
+        logging: false,
+        letterRendering: true,
+        onclone: function(doc) {
+            doc.querySelectorAll("[data-lucide]").forEach(el => el.removeAttribute("data-lucide"));
+        }
     }).then(canvas => {
         canvas.toBlob(blob => {
             const file = new File([blob], "privacy-scorecard.png", { type: "image/png" });
