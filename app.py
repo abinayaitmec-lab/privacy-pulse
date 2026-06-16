@@ -10,6 +10,13 @@ load_dotenv()
 
 app = Flask(__name__)
 
+@app.after_request
+def add_cors(r):
+    r.headers["Access-Control-Allow-Origin"] = "*"
+    r.headers["Access-Control-Allow-Headers"] = "*"
+    r.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    return r
+
 scraper = cloudscraper.create_scraper()
 h = HTML2Text()
 h.ignore_links = True

@@ -740,7 +740,7 @@ async function scan() {
     if (popular) popular.style.display = "none";
 
     try {
-        const res = await fetch("/scan", {
+        const res = await fetch("https://privacy-pulse-w415.onrender.com/scan", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ url: raw })
