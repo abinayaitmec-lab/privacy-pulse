@@ -526,14 +526,15 @@ def scan():
                 results["scorecard"] = ai_parse(raw)
 
         if not results.get("scorecard"):
+            msg = f"{domain} blocks privacy scanners — which is itself a red flag.\n\nYou can check manually: Search \"{domain} privacy policy\" in your browser."
             # Quick check — does the homepage itself load?
             try:
                 quick = scraper.get(clean_url, timeout=6, headers=HEADERS, allow_redirects=True)
                 if quick.status_code < 400:
-                    return jsonify({"url": raw_url, "clean_domain": domain, "error": f"{domain} has no privacy policy — try a site like google.com or flipkart.com."})
+                    return jsonify({"url": raw_url, "clean_domain": domain, "error": msg})
             except Exception:
                 pass
-            return jsonify({"url": raw_url, "clean_domain": domain, "error": f"Could not reach {domain}. The site may be down or not accessible."})
+            return jsonify({"url": raw_url, "clean_domain": domain, "error": msg})
 
         # Cache for consistency on repeat scans
         SCORECARD_CACHE[domain] = results["scorecard"]
