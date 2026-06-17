@@ -237,8 +237,13 @@ def ai_parse(raw):
         raw = raw.replace(c, "")
     raw = raw.strip()
     try:
-        return json.loads(raw)
-    except json.JSONDecodeError:
+        obj = json.loads(raw)
+        cats = obj.get("categories", {})
+        expected = {"data_collection", "data_sharing", "user_rights", "tracking", "clarity"}
+        if not expected.issubset(cats.keys()):
+            return None
+        return obj
+    except Exception:
         return None
 
 SCORE_PROMPT = """Analyze this privacy policy. Return ONLY valid JSON with these exact fields (no markdown, no code blocks):
