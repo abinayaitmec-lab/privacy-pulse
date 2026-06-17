@@ -80,6 +80,8 @@ PRIVACY_PATHS = [
     "/en-US/privacy/privacy-policy", "/privacy-notice", "/data-privacy",
     "/privacy-policy/", "/legal/privacy-policy.html", "/pages/privacy-policy",
     "/about/privacy", "/corporate/privacy",
+    "/legal/in/eng/privacy_policy.html",  # MakeMyTrip
+    "/terms/privacy-policy", "/privacy/privacy-policy",
 ]
 
 IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp", ".svg", ".ico")
