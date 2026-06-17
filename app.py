@@ -423,6 +423,20 @@ KNOWN_SITES = {
         "red_flags": ["Recently changed policy to allow AI training on user data", "Shares data with third-party partners", "Tracks user activity across the web"],
         "data_collected": ["Posts and engagement data", "Device and browser info", "Location data", "Ads interaction data"]
     },
+    "makemytrip.com": {
+        "site_name": "MakeMyTrip",
+        "overall_score": 4, "grade": "D",
+        "verdict": "Collects booking and travel data with extensive ad tracking.",
+        "categories": {
+            "data_collection": {"score": 3, "explanation": "Collects booking details, payment info, travel preferences, and device data"},
+            "data_sharing": {"score": 4, "explanation": "Shares with travel partners (airlines, hotels) and marketing networks"},
+            "user_rights": {"score": 5, "explanation": "Basic account controls — can access data but deletion is limited"},
+            "tracking": {"score": 3, "explanation": "Heavy tracking via booking retargeting pixels and analytics"},
+            "clarity": {"score": 5, "explanation": "Policy is detailed but uses some technical language"}
+        },
+        "red_flags": ["Shares booking data with third-party travel partners", "Extensive retargeting ads across travel websites", "Collects payment and billing information"],
+        "data_collected": ["Booking and reservation history", "Payment and billing data", "Travel preferences", "Device and location data", "Cookies and usage data"]
+    },
     "linkedin.com": {
         "site_name": "LinkedIn",
         "overall_score": 5, "grade": "C",
@@ -514,10 +528,10 @@ def scan():
             try:
                 quick = scraper.get(clean_url, timeout=6, headers=HEADERS, allow_redirects=True)
                 if quick.status_code < 400:
-                    return jsonify({"url": raw_url, "clean_domain": domain, "error": f"We could reach {domain} but couldn't find a privacy policy on it. Not every website has one — try a different site."})
+                    return jsonify({"url": raw_url, "clean_domain": domain, "error": f"{domain} has no privacy policy — try a site like google.com or flipkart.com."})
             except Exception:
                 pass
-            return jsonify({"url": raw_url, "clean_domain": domain, "error": f"Could not reach {domain} to check its privacy policy. The site may be down or blocking our access."})
+            return jsonify({"url": raw_url, "clean_domain": domain, "error": f"Could not reach {domain}. The site may be down or not accessible."})
 
         # Cache for consistency on repeat scans
         SCORECARD_CACHE[domain] = results["scorecard"]
