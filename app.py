@@ -510,7 +510,14 @@ def scan():
                 results["scorecard"] = ai_parse(raw)
 
         if not results.get("scorecard"):
-            return jsonify({"url": raw_url, "clean_domain": domain, "error": f"Could not find or access the privacy policy for {domain}. The site may block automated requests, require JavaScript, or the policy may not be publicly accessible."})
+            # Quick check — does the homepage itself load?
+            try:
+                quick = scraper.get(clean_url, timeout=6, headers=HEADERS, allow_redirects=True)
+                if quick.status_code < 400:
+                    return jsonify({"url": raw_url, "clean_domain": domain, "error": f"We could reach {domain} but couldn't find a privacy policy on it. Not every website has one — try a different site."})
+            except Exception:
+                pass
+            return jsonify({"url": raw_url, "clean_domain": domain, "error": f"Could not reach {domain} to check its privacy policy. The site may be down or blocking our access."})
 
         # Cache for consistency on repeat scans
         SCORECARD_CACHE[domain] = results["scorecard"]
