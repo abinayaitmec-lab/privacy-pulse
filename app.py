@@ -1,4 +1,4 @@
-import os, re, json, random, requests, cloudscraper, traceback
+import os, re, json, requests, cloudscraper, traceback
 from urllib.parse import urlparse
 from flask import Flask, render_template, request, jsonify
 from bs4 import BeautifulSoup
@@ -213,32 +213,8 @@ def known_site_fallback(domain):
     """Check if the domain matches a known curated site."""
     for known_domain, card in KNOWN_SITES.items():
         if domain == known_domain or domain.endswith("." + known_domain):
-            return {**card, "known": True}
+            return {**card}
     return None
-
-def default_score(domain):
-    n = random.choice([5, 6, 7])
-    grade = {5: "C", 6: "C", 7: "B"}[n]
-    verb = {5: "Moderate privacy practices — some concerns to consider.", 6: "Above average privacy practices — most areas look reasonable.", 7: "Good privacy practices — only minor concerns noted."}
-    flag = {5: ["Some data collection and sharing practices need review"], 6: ["Minor data handling concerns found"], 7: ["Limited privacy concerns — generally safe"]}
-    collect = {5: ["Account info", "Usage data"], 6: ["Basic account details", "Service usage data"], 7: ["Essential account data", "Core service info"]}
-    expl = {5: "Moderate practices in this area", 6: "Reasonable practices in this area", 7: "Good practices in this area"}
-    return {
-        "site_name": domain,
-        "overall_score": n,
-        "grade": grade,
-        "verdict": verb[n],
-        "categories": {
-            "data_collection": {"score": n - 1, "explanation": expl[n]},
-            "data_sharing": {"score": n - 1, "explanation": expl[n]},
-            "user_rights": {"score": n, "explanation": expl[n]},
-            "tracking": {"score": n - 1, "explanation": expl[n]},
-            "clarity": {"score": n, "explanation": expl[n]}
-        },
-        "red_flags": flag[n],
-        "data_collected": collect[n],
-        "estimated": True
-    }
 
 def extract_text(url):
     if any(url.lower().endswith(ext) for ext in IMAGE_EXTENSIONS):
@@ -318,7 +294,7 @@ def scan():
                 results["scorecard"] = ai_parse(raw)
 
         if not results.get("scorecard"):
-            results["scorecard"] = default_score(domain)
+            return jsonify({"url": raw_url, "clean_domain": domain, "error": f"Could not find or access the privacy policy for {domain}. The site may block automated requests or require JavaScript."})
 
         return jsonify(results)
 
@@ -326,8 +302,7 @@ def scan():
         return jsonify({"url": raw_url, "clean_domain": domain, "error": str(e).strip()})
     except Exception as e:
         print("SCAN ERROR:", traceback.format_exc())
-        results = {"url": raw_url, "clean_domain": domain, "scorecard": default_score(domain)}
-        return jsonify(results)
+        return jsonify({"url": raw_url, "clean_domain": domain, "error": f"Something went wrong scanning {domain}. Try again."})
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)
