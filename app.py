@@ -483,6 +483,10 @@ def scan():
     clean_url = "https://" + raw_url if not raw_url.startswith("http") else raw_url
     domain = extract_domain(raw_url)
 
+    # Check if input looks like a search query, not a website URL
+    if not re.search(r"\.\w{2,}", domain) and "localhost" not in domain and not re.match(r"^\d+\.\d+\.\d+\.\d+$", domain):
+        return jsonify({"url": raw_url, "clean_domain": domain, "error": f"\"{raw_url}\" does not look like a website URL. This tool only analyzes real websites — enter a URL like google.com or example.org."})
+
     # Fast DNS check — reject invalid domains immediately
     if not domain_exists(domain):
         return jsonify({"url": raw_url, "clean_domain": domain, "error": f"\"{domain}\" does not appear to be a real website. Check the spelling and try again."})
