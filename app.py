@@ -10,6 +10,9 @@ load_dotenv()
 
 app = Flask(__name__)
 
+# In-memory cache so same domain always returns identical score
+SCORECARD_CACHE = {}
+
 @app.after_request
 def add_cors(r):
     r.headers["Access-Control-Allow-Origin"] = "*"
@@ -64,7 +67,7 @@ def groq_complete(prompt):
             return client.chat.completions.create(
                 model="llama-3.3-70b-versatile",
                 messages=[{"role": "user", "content": prompt}],
-                temperature=0.3,
+                temperature=0,
                 max_tokens=2000
             ).choices[0].message.content
         except Exception:
@@ -477,6 +480,10 @@ def scan():
         if fallback:
             return jsonify({"url": raw_url, "clean_domain": domain, "scorecard": fallback, "error": None})
 
+        # Return cached score if available (same domain → identical result)
+        if domain in SCORECARD_CACHE:
+            return jsonify({"url": raw_url, "clean_domain": domain, "scorecard": SCORECARD_CACHE[domain], "error": None})
+
         policy_url = find_page(clean_url, PRIVACY_PATHS)
         results = {"url": raw_url, "clean_domain": domain, "scorecard": None, "error": None}
 
@@ -488,6 +495,9 @@ def scan():
 
         if not results.get("scorecard"):
             return jsonify({"url": raw_url, "clean_domain": domain, "error": f"Could not find or access the privacy policy for {domain}. The site may block automated requests, require JavaScript, or the policy may not be publicly accessible."})
+
+        # Cache for consistency on repeat scans
+        SCORECARD_CACHE[domain] = results["scorecard"]
 
         return jsonify(results)
 
