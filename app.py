@@ -1,4 +1,4 @@
-import os, re, json, requests, cloudscraper, traceback, time
+import os, re, json, requests, cloudscraper, traceback, time, socket
 from urllib.parse import urlparse
 from flask import Flask, render_template, request, jsonify
 from bs4 import BeautifulSoup
@@ -197,6 +197,14 @@ def extract_domain(raw_url):
     parsed = urlparse(raw_url)
     domain = parsed.netloc.lower()
     return domain.replace("www.", "")
+
+def domain_exists(domain):
+    """Check if a domain has DNS records (fast validation before scraping)."""
+    try:
+        socket.getaddrinfo(domain, 80, socket.AF_INET, socket.SOCK_STREAM)
+        return True
+    except socket.gaierror:
+        return False
 
 def check_robots_txt(base_url):
     """Check if scraping the privacy policy is allowed by robots.txt."""
@@ -474,6 +482,10 @@ def scan():
     raw_url = request.json.get("url", "").strip()
     clean_url = "https://" + raw_url if not raw_url.startswith("http") else raw_url
     domain = extract_domain(raw_url)
+
+    # Fast DNS check — reject invalid domains immediately
+    if not domain_exists(domain):
+        return jsonify({"url": raw_url, "clean_domain": domain, "error": f"\"{domain}\" does not appear to be a real website. Check the spelling and try again."})
 
     try:
         fallback = known_site_fallback(domain)
