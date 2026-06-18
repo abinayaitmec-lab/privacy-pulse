@@ -897,7 +897,6 @@ function shareScore() {
     const original = document.getElementById("captureArea");
     const clone = original.cloneNode(true);
     clone.style.background = "#12141f";
-    clone.style.borderRadius = "16px";
     clone.style.padding = "24px";
     clone.style.width = original.offsetWidth + "px";
 
@@ -905,15 +904,14 @@ function shareScore() {
     wrapper.style.position = "fixed";
     wrapper.style.left = "-9999px";
     wrapper.style.top = "0";
-    wrapper.style.background = "#0d0d0d";
-    wrapper.style.borderRadius = "16px";
+    wrapper.style.background = "#12141f";
     wrapper.style.padding = "24px";
-    wrapper.style.width = (original.offsetWidth + 48) + "px";
+    wrapper.style.width = original.offsetWidth + "px";
     wrapper.appendChild(clone);
     document.body.appendChild(wrapper);
 
     html2canvas(wrapper, {
-        background: "#0d0d0d",
+        background: "#12141f",
         scale: 3,
         logging: false,
         letterRendering: true
