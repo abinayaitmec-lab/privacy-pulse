@@ -906,11 +906,13 @@ function shareScore() {
     wrapper.style.left = "-9999px";
     wrapper.style.top = "0";
     wrapper.style.background = "#0d0d0d";
-    wrapper.style.padding = "40px";
+    wrapper.style.borderRadius = "16px";
+    wrapper.style.padding = "24px";
+    wrapper.style.width = (original.offsetWidth + 48) + "px";
     wrapper.appendChild(clone);
     document.body.appendChild(wrapper);
 
-    html2canvas(clone, {
+    html2canvas(wrapper, {
         background: "#0d0d0d",
         scale: 3,
         logging: false,
