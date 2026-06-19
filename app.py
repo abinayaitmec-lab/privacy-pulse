@@ -13,6 +13,19 @@ app = Flask(__name__)
 # In-memory cache so same domain always returns identical score
 SCORECARD_CACHE = {}
 
+# --- Supabase ---
+SUPABASE_ENABLED = False
+supabase = None
+try:
+    from supabase import create_client
+    su_url = os.getenv("SUPABASE_URL")
+    su_key = os.getenv("SUPABASE_KEY")
+    if su_url and su_key:
+        supabase = create_client(su_url, su_key)
+        SUPABASE_ENABLED = True
+except ImportError:
+    pass
+
 @app.after_request
 def add_cors(r):
     r.headers["Access-Control-Allow-Origin"] = "*"
@@ -489,9 +502,76 @@ def known_site_fallback(domain):
             return {**card}
     return None
 
+# --- Supabase helpers ---
+def fetch_community_policy(domain):
+    """Check Supabase approved_policies for a community-contributed policy."""
+    if not SUPABASE_ENABLED:
+        return None
+    try:
+        resp = supabase.table("approved_policies").select("*").eq("domain", domain).limit(1).execute()
+        if resp.data and len(resp.data) > 0:
+            row = resp.data[0]
+            return {"site_name": domain, "policy_text": row.get("policy_text", ""), "policy_url": row.get("policy_url", "")}
+    except Exception:
+        pass
+    return None
+
+def score_community_policy(policy_text, domain):
+    """Send community policy text through Groq to get a scorecard."""
+    if not policy_text:
+        return None
+    raw = groq_complete(SCORE_PROMPT + policy_text[:15000])
+    return ai_parse(raw)
+
+def submit_contribution(domain, policy_url, policy_text, notes):
+    """Insert a new pending contribution into Supabase."""
+    if not SUPABASE_ENABLED:
+        return False
+    try:
+        supabase.table("pending_contributions").insert({
+            "domain": domain,
+            "policy_url": policy_url or "",
+            "policy_text": policy_text or "",
+            "notes": notes or "",
+            "status": "pending"
+        }).execute()
+        return True
+    except Exception:
+        return False
+
 @app.route("/")
 def health():
     return jsonify({"status": "ok"})
+
+@app.route("/contribute", methods=["POST"])
+def contribute():
+    data = request.json or {}
+    domain = data.get("domain", "").strip().lower()
+    policy_url = data.get("policy_url", "").strip()
+    policy_text = data.get("policy_text", "").strip()
+    notes = data.get("notes", "").strip()
+
+    if not domain:
+        return jsonify({"error": "Domain is required."}), 400
+
+    if not policy_url and not policy_text:
+        return jsonify({"error": "Provide a privacy policy URL, paste the policy text, or both."}), 400
+
+    # If URL provided but no text, try scraping
+    if policy_url and not policy_text:
+        try:
+            policy_text = extract_text(policy_url)
+        except Exception:
+            pass
+
+    if not SUPABASE_ENABLED:
+        return jsonify({"error": "Contribution system is not configured (missing Supabase credentials)."}), 500
+
+    ok = submit_contribution(domain, policy_url, policy_text, notes)
+    if not ok:
+        return jsonify({"error": "Failed to submit contribution. Try again later."}), 500
+
+    return jsonify({"message": f"Thank you! Your contribution for {domain} has been submitted for review."})
 
 @app.route("/scan", methods=["POST"])
 def scan():
@@ -508,14 +588,25 @@ def scan():
         return jsonify({"url": raw_url, "clean_domain": domain, "error": f"\"{domain}\" does not appear to be a real website. Check the spelling and try again."})
 
     try:
+        # 1) Hardcoded known sites
         fallback = known_site_fallback(domain)
         if fallback:
-            return jsonify({"url": raw_url, "clean_domain": domain, "scorecard": fallback, "error": None})
+            return jsonify({"url": raw_url, "clean_domain": domain, "scorecard": {**fallback, "_source": "expert"}, "error": None})
 
-        # Return cached score if available (same domain → identical result)
+        # Return cached score if available
         if domain in SCORECARD_CACHE:
             return jsonify({"url": raw_url, "clean_domain": domain, "scorecard": SCORECARD_CACHE[domain], "error": None})
 
+        # 2) Community contributed policies from Supabase
+        community = fetch_community_policy(domain)
+        if community and community.get("policy_text"):
+            scored = score_community_policy(community["policy_text"], domain)
+            if scored:
+                scored["_source"] = "community"
+                SCORECARD_CACHE[domain] = scored
+                return jsonify({"url": raw_url, "clean_domain": domain, "scorecard": scored, "error": None})
+
+        # 3) Live scraping
         policy_url = find_page(clean_url, PRIVACY_PATHS)
         results = {"url": raw_url, "clean_domain": domain, "scorecard": None, "error": None}
 
@@ -523,18 +614,14 @@ def scan():
             text = extract_text(policy_url)
             if text:
                 raw = groq_complete(SCORE_PROMPT + text)
-                results["scorecard"] = ai_parse(raw)
+                parsed = ai_parse(raw)
+                if parsed:
+                    parsed["_source"] = "live"
+                    results["scorecard"] = parsed
 
         if not results.get("scorecard"):
             msg = f"{domain} blocks privacy scanners — which is itself a red flag.\n\nYou can check manually: Search \"{domain} privacy policy\" in your browser."
-            # Quick check — does the homepage itself load?
-            try:
-                quick = scraper.get(clean_url, timeout=6, headers=HEADERS, allow_redirects=True)
-                if quick.status_code < 400:
-                    return jsonify({"url": raw_url, "clean_domain": domain, "error": msg})
-            except Exception:
-                pass
-            return jsonify({"url": raw_url, "clean_domain": domain, "error": msg})
+            return jsonify({"url": raw_url, "clean_domain": domain, "error": msg, "error_type": "not_found"})
 
         # Cache for consistency on repeat scans
         SCORECARD_CACHE[domain] = results["scorecard"]

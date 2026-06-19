@@ -305,6 +305,46 @@ h1 { font-size: 22px; text-align: center; margin-bottom: 4px; font-weight: 700; 
 }
 .popular-card-desc { font-size: 11px; color: #63637a; line-height: 1.4; }
 
+/* Contribution form */
+.contribute-section { margin-top: 20px; text-align: center; display: none; }
+.contribute-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: linear-gradient(135deg, #22c55e, #16a34a); color: #000;
+    border: none; padding: 12px 24px; border-radius: 12px;
+    font-size: 14px; font-weight: 700; cursor: pointer;
+    transition: all .25s;
+}
+.contribute-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 25px -8px rgba(34,197,94,0.4); }
+.contribute-form { display: none; margin-top: 16px; text-align: left; }
+.contribute-form input, .contribute-form textarea {
+    width: 100%; padding: 10px 14px; margin-bottom: 10px;
+    background: #0a0d16; border: 1px solid #27272a; border-radius: 10px;
+    color: #e4e4e7; font-size: 13px; outline: none;
+    font-family: inherit; box-sizing: border-box;
+}
+.contribute-form input:focus, .contribute-form textarea:focus {
+    border-color: #22c55e; box-shadow: 0 0 0 3px rgba(34,197,94,0.08);
+}
+.contribute-form textarea { min-height: 100px; resize: vertical; }
+.contribute-form label { font-size: 12px; font-weight: 600; color: #a1a1aa; margin-bottom: 4px; display: block; }
+.contribute-submit {
+    width: 100%; padding: 12px; background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: #000; border: none; border-radius: 10px; font-size: 14px; font-weight: 700;
+    cursor: pointer; transition: all .25s;
+}
+.contribute-submit:hover { transform: translateY(-1px); box-shadow: 0 8px 25px -8px rgba(34,197,94,0.4); }
+.contribute-submit:disabled { opacity: 0.4; cursor: not-allowed; }
+.contribute-thanks { display: none; margin-top: 16px; padding: 16px; background: rgba(34,197,94,0.08); border-radius: 12px; color: #22c55e; font-size: 14px; font-weight: 600; text-align: center; }
+
+/* Source badge */
+.source-badge {
+    display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 8px;
+    border-radius: 5px; margin-left: 6px; letter-spacing: 0.3px;
+}
+.source-badge.expert { background: rgba(34,197,94,0.15); color: #22c55e; }
+.source-badge.community { background: rgba(139,92,246,0.15); color: #a78bfa; }
+.source-badge.live { background: rgba(59,130,246,0.15); color: #60a5fa; }
+
 /* Empty state */
 .empty-state { text-align: center; padding: 32px 20px; color: #52525b; font-size: 14px; }
 
@@ -574,6 +614,24 @@ h1 { font-size: 22px; text-align: center; margin-bottom: 4px; font-weight: 700; 
             <div id="errorMsg"></div>
         </div>
 
+        <div class="contribute-section" id="contributeSection">
+            <button class="contribute-btn" id="contributeBtn" onclick="showContributeForm()">
+                Contribute Privacy Policy
+            </button>
+            <div class="contribute-form" id="contributeForm">
+                <label>Domain</label>
+                <input type="text" id="contributeDomain" readonly>
+                <label>Privacy Policy URL</label>
+                <input type="url" id="contributeUrl" placeholder="https://example.com/privacy">
+                <label>Paste the policy text (optional if URL provided)</label>
+                <textarea id="contributeText" placeholder="Paste the full privacy policy text here..."></textarea>
+                <label>Notes (optional)</label>
+                <input type="text" id="contributeNotes" placeholder="Any extra info?">
+                <button class="contribute-submit" id="contributeSubmit" onclick="submitContribution()">Submit</button>
+            </div>
+            <div class="contribute-thanks" id="contributeThanks"></div>
+        </div>
+
         <div class="badges">
             <span class="badge-pill"><span data-lucide="search" style="width:12px;height:12px;color:#22c55e"></span> 10,000+ Sites Scanned</span>
             <span class="badge-pill"><span data-lucide="shield" style="width:12px;height:12px;color:#22c55e"></span> Free Forever</span>
@@ -659,6 +717,7 @@ h1 { font-size: 22px; text-align: center; margin-bottom: 4px; font-weight: 700; 
                 <div class="scorecard-site-area">
                     <span class="site-name" id="siteName"></span>
                     <span class="grade-badge" id="gradeBadge"></span>
+                    <span class="source-badge" id="sourceBadge" style="display:none"></span>
                 </div>
             </div>
             <div class="score-section">
@@ -746,7 +805,7 @@ async function scan() {
         const data = await res.json();
 
         if (data.error) {
-            showError(data.clean_domain || raw, data.error);
+            showError(data.clean_domain || raw, data.error, data.error_type);
             return;
         }
 
@@ -759,7 +818,7 @@ async function scan() {
     }
 }
 
-function showError(domain, msg) {
+function showError(domain, msg, errorType) {
     const error = document.getElementById("error");
     const empty = document.getElementById("emptyState");
     const urlDisplay = document.getElementById("errorUrl");
@@ -773,6 +832,15 @@ function showError(domain, msg) {
     error.style.display = "block";
     empty.style.display = "block";
     if (popular) popular.style.display = "";
+
+    // Show contribution form for not_found errors
+    const cs = document.getElementById("contributeSection");
+    if (errorType === "not_found") {
+        cs.style.display = "block";
+        document.getElementById("contributeDomain").value = domain || "";
+    } else {
+        cs.style.display = "none";
+    }
 }
 
 function getCategoryDescription(category, score) {
@@ -825,7 +893,13 @@ function renderScorecard(s) {
     badge.textContent = s.grade || "N/A";
     badge.style.background = scoreColor(s.overall_score || 0);
 
-
+    // Source badge
+    const sb = document.getElementById("sourceBadge");
+    const source = s._source || "";
+    if (source === "expert") { sb.textContent = "Expert Analysis"; sb.className = "source-badge expert"; sb.style.display = ""; }
+    else if (source === "community") { sb.textContent = "Community"; sb.className = "source-badge community"; sb.style.display = ""; }
+    else if (source === "live") { sb.textContent = "Live Scan"; sb.className = "source-badge live"; sb.style.display = ""; }
+    else { sb.style.display = "none"; }
 
     const os = s.overall_score || 0;
     const color = scoreColor(os);
@@ -942,6 +1016,49 @@ function shareScore() {
 
 function goBack() {
     location.reload();
+}
+
+function showContributeForm() {
+    document.getElementById("contributeBtn").style.display = "none";
+    document.getElementById("contributeForm").style.display = "block";
+}
+
+async function submitContribution() {
+    const domain = document.getElementById("contributeDomain").value.trim();
+    const policyUrl = document.getElementById("contributeUrl").value.trim();
+    const policyText = document.getElementById("contributeText").value.trim();
+    const notes = document.getElementById("contributeNotes").value.trim();
+    const btn = document.getElementById("contributeSubmit");
+
+    if (!policyUrl && !policyText) {
+        alert("Please provide a privacy policy URL, paste the policy text, or both.");
+        return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "Submitting...";
+
+    try {
+        const res = await fetch("https://privacy-pulse-w415.onrender.com/contribute", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ domain, policy_url: policyUrl, policy_text: policyText, notes })
+        });
+        const data = await res.json();
+        if (data.message) {
+            document.getElementById("contributeForm").style.display = "none";
+            const thanks = document.getElementById("contributeThanks");
+            thanks.textContent = data.message;
+            thanks.style.display = "block";
+        } else {
+            alert(data.error || "Something went wrong.");
+        }
+    } catch (e) {
+        alert("Failed to submit. Try again.");
+    } finally {
+        btn.disabled = false;
+        btn.textContent = "Submit";
+    }
 }
 
 document.getElementById("urlInput").addEventListener("keydown", e => {

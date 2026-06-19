@@ -8,3 +8,4 @@ cloudscraper
 gunicorn
 curl-cffi
 pdfplumber
+supabase
