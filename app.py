@@ -30,8 +30,13 @@ except ImportError:
 def add_cors(r):
     r.headers["Access-Control-Allow-Origin"] = "*"
     r.headers["Access-Control-Allow-Headers"] = "*"
-    r.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    r.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS, PUT, DELETE"
     return r
+
+@app.before_request
+def handle_preflight():
+    if request.method == "OPTIONS":
+        return jsonify({"ok": True})
 
 # --- HTTP clients ---
 scraper = cloudscraper.create_scraper()
