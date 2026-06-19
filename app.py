@@ -490,8 +490,8 @@ def known_site_fallback(domain):
     return None
 
 @app.route("/")
-def index():
-    return render_template("index.html")
+def health():
+    return jsonify({"status": "ok"})
 
 @app.route("/scan", methods=["POST"])
 def scan():
