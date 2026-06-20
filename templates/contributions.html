@@ -14,24 +14,31 @@ body {
     padding: 40px 40px;
 }
 .wrapper { width: 100%; max-width: 1100px; margin: 0 auto; }
-.header-row {
+
+/* Navbar */
+.navbar {
     display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 32px; flex-wrap: wrap; gap: 12px;
+    padding: 16px 0; margin-bottom: 40px; border-bottom: 1px solid #1a1c28;
 }
-.header-left { display: flex; align-items: center; gap: 10px; }
-.brand-icon {
-    width: 32px; height: 32px;
+.nav-left { display: flex; align-items: center; gap: 10px; }
+.nav-brand {
+    display: flex; align-items: center; gap: 8px; text-decoration: none;
+}
+.nav-brand-icon {
+    width: 30px; height: 30px;
     background: linear-gradient(135deg, #22c55e, #16a34a);
-    border-radius: 9px;
+    border-radius: 8px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 16px;
+    font-size: 15px;
 }
-.brand-text { font-size: 18px; font-weight: 800; color: #e4e4e7; letter-spacing: -0.5px; }
-.header-right a {
-    color: #22c55e; text-decoration: none; font-size: 13px; font-weight: 600;
-    padding: 8px 18px; border: 1px solid #22c55e; border-radius: 8px; transition: all .2s;
+.nav-brand-text { font-size: 17px; font-weight: 800; color: #e4e4e7; letter-spacing: -0.5px; }
+.nav-right { display: flex; gap: 4px; }
+.nav-link {
+    padding: 8px 16px; border-radius: 8px; text-decoration: none;
+    font-size: 13px; font-weight: 600; color: #63637a; transition: all .2s;
 }
-.header-right a:hover { background: rgba(34,197,94,0.1); }
+.nav-link:hover { color: #e4e4e7; background: rgba(255,255,255,0.04); }
+.nav-link.active { color: #22c55e; background: rgba(34,197,94,0.08); }
 
 h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
 .subtitle { color: #71717a; font-size: 14px; margin-bottom: 28px; }
@@ -87,7 +94,7 @@ td.date { color: #63637a; font-size: 13px; }
     body { padding: 20px 16px; }
     h1 { font-size: 20px; }
     .subtitle { font-size: 13px; }
-    .header-row { flex-direction: column; align-items: flex-start; }
+    .navbar { flex-wrap: wrap; gap: 8px; }
     td, th { padding: 12px 8px; font-size: 13px; }
     .filter-btn { padding: 6px 14px; font-size: 12px; }
 }
@@ -101,13 +108,16 @@ td.date { color: #63637a; font-size: 13px; }
 </head>
 <body>
 <div class="wrapper">
-    <div class="header-row">
-        <div class="header-left">
-            <div class="brand-icon">🛡️</div>
-            <span class="brand-text">PrivacyPulse</span>
+    <nav class="navbar">
+        <a href="/" class="nav-brand">
+            <div class="nav-brand-icon">🛡️</div>
+            <span class="nav-brand-text">PrivacyPulse</span>
+        </a>
+        <div class="nav-right">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/contributions" class="nav-link active">Contributions</a>
         </div>
-        <div class="header-right"><a href="/">← Back to Home</a></div>
-    </div>
+    </nav>
 
     <h1>Community Contributions</h1>
     <p class="subtitle">See what sites the community has helped us analyze</p>
