@@ -1057,7 +1057,7 @@ async function submitContribution() {
             alert(data.error || "Something went wrong.");
         }
     } catch (e) {
-        alert("Failed to submit. Try again.");
+        alert("Network error — check that the backend server is running and try again.");
     } finally {
         btn.disabled = false;
         btn.textContent = "Submit";

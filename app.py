@@ -36,7 +36,11 @@ def add_cors(r):
 @app.before_request
 def handle_preflight():
     if request.method == "OPTIONS":
-        return jsonify({"ok": True})
+        resp = jsonify({"ok": True})
+        resp.headers["Access-Control-Allow-Origin"] = "*"
+        resp.headers["Access-Control-Allow-Headers"] = "*"
+        resp.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS, PUT, DELETE"
+        return resp
 
 # --- HTTP clients ---
 scraper = cloudscraper.create_scraper()
