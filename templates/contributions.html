@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Community Contributions — PrivacyPulse</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #080b14;
+    color: #e4e4e7;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+}
+.wrapper { width: 100%; max-width: 700px; position: relative; z-index: 1; }
+.card {
+    background: linear-gradient(145deg, #12141f, #0e101a);
+    border-radius: 28px;
+    padding: 36px;
+    width: 100%;
+    box-shadow: 0 25px 60px -12px rgba(0,0,0,0.8);
+    border: 1px solid rgba(34,197,94,0.15);
+}
+.brand {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 24px;
+}
+.brand-icon {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+}
+.brand-text { font-size: 18px; font-weight: 800; color: #e4e4e7; letter-spacing: -0.5px; }
+h1 { font-size: 22px; margin-bottom: 4px; font-weight: 700; }
+.subtitle { color: #71717a; font-size: 13px; margin-bottom: 24px; line-height: 1.5; }
+
+/* Filters */
+.filters { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+.filter-btn {
+    padding: 6px 16px; border-radius: 20px; border: 1px solid #27272a;
+    background: transparent; color: #71717a; font-size: 12px; font-weight: 600;
+    cursor: pointer; transition: all .2s;
+}
+.filter-btn:hover { border-color: #22c55e; color: #22c55e; }
+.filter-btn.active { background: rgba(34,197,94,0.12); border-color: #22c55e; color: #22c55e; }
+
+/* Table */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; padding: 12px 8px; color: #63637a; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #1a1c28; }
+td { padding: 14px 8px; border-bottom: 1px solid #171a26; }
+td.domain { font-weight: 700; color: #e4e4e7; }
+td.contributor { color: #22c55e; }
+td.date { color: #63637a; font-size: 12px; }
+
+.status-badge {
+    display: inline-block; font-size: 11px; font-weight: 700;
+    padding: 4px 10px; border-radius: 20px;
+}
+.status-badge.pending { background: rgba(234,179,8,0.12); color: #eab308; }
+.status-badge.approved { background: rgba(34,197,94,0.12); color: #22c55e; }
+.status-badge.rejected { background: rgba(239,68,68,0.12); color: #ef4444; }
+
+.empty-state { text-align: center; padding: 60px 20px; color: #52525b; }
+.empty-state .big { font-size: 40px; margin-bottom: 12px; }
+.empty-state p { font-size: 14px; line-height: 1.6; }
+.empty-state a { color: #22c55e; text-decoration: none; font-weight: 600; }
+.empty-state a:hover { text-decoration: underline; }
+
+.loading { text-align: center; padding: 60px 20px; color: #71717a; font-size: 14px; }
+.loading-bar { width: 200px; height: 3px; background: #1a1c28; border-radius: 2px; overflow: hidden; margin: 12px auto; }
+.loading-bar-fill { height: 100%; width: 30%; background: linear-gradient(90deg, #22c55e, #4ade80); border-radius: 2px; animation: loadingSlide 1.2s ease-in-out infinite; }
+@keyframes loadingSlide {
+    0% { transform: translateX(-100%); width: 30%; }
+    50% { width: 60%; }
+    100% { transform: translateX(400%); width: 30%; }
+}
+
+.footer { text-align: center; margin-top: 24px; font-size: 11px; color: #3f3f50; padding-bottom: 20px; }
+.footer a { color: #3f3f50; text-decoration: none; }
+.footer a:hover { color: #22c55e; }
+
+@media (max-width: 540px) {
+    body { padding: 16px 12px; }
+    .card { padding: 20px; border-radius: 20px; }
+    h1 { font-size: 18px; }
+    .subtitle { font-size: 12px; }
+    td, th { padding: 10px 6px; font-size: 12px; }
+    .filter-btn { padding: 5px 12px; font-size: 11px; }
+}
+</style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="card">
+        <div class="brand">
+            <div class="brand-icon">🛡️</div>
+            <span class="brand-text">PrivacyPulse</span>
+        </div>
+        <h1>Community Contributions</h1>
+        <p class="subtitle">See what sites the community has helped us analyze</p>
+
+        <div class="filters" id="filters">
+            <button class="filter-btn active" data-filter="all" onclick="filterContributions('all')">All</button>
+            <button class="filter-btn" data-filter="pending" onclick="filterContributions('pending')">Pending</button>
+            <button class="filter-btn" data-filter="approved" onclick="filterContributions('approved')">Approved</button>
+            <button class="filter-btn" data-filter="rejected" onclick="filterContributions('rejected')">Rejected</button>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="loading-bar"><div class="loading-bar-fill"></div></div>
+            <span>Loading contributions...</span>
+        </div>
+
+        <div class="table-wrap">
+            <table id="contribTable" style="display:none">
+                <thead>
+                    <tr>
+                        <th>Domain</th>
+                        <th>Contributor</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="contribBody"></tbody>
+            </table>
+        </div>
+
+        <div class="empty-state" id="emptyState" style="display:none">
+            <div class="big">📋</div>
+            <p>No contributions yet.<br>Be the first to help the community!</p>
+            <p style="margin-top:12px"><a href="/">← Back to PrivacyPulse</a></p>
+        </div>
+    </div>
+    <div class="footer"><a href="/">PrivacyPulse</a> &mdash; Free privacy checker</div>
+</div>
+
+<script>
+const API = "https://privacy-pulse-w415.onrender.com/api/contributions";
+
+async function loadContributions() {
+    try {
+        const res = await fetch(API);
+        const data = await res.json();
+        const items = data.contributions || [];
+        document.getElementById("loading").style.display = "none";
+
+        if (items.length === 0) {
+            document.getElementById("emptyState").style.display = "block";
+            return;
+        }
+
+        const tbody = document.getElementById("contribBody");
+        const table = document.getElementById("contribTable");
+        table.style.display = "";
+        window._allItems = items;
+        renderRows(items);
+    } catch (e) {
+        document.getElementById("loading").innerHTML = '<span>Failed to load contributions. Try again later.</span>';
+    }
+}
+
+function renderRows(items) {
+    const tbody = document.getElementById("contribBody");
+    tbody.innerHTML = items.map(item => {
+        const status = (item.status || "pending").toLowerCase();
+        const statusLabels = { pending: "🟡 Pending Review", approved: "✅ Approved", rejected: "❌ Rejected" };
+        const label = statusLabels[status] || "🟡 " + status;
+        const date = item.submitted_at ? new Date(item.submitted_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "—";
+        const name = item.contributor_name || "Anonymous";
+        return `<tr>
+            <td class="domain">${item.domain}</td>
+            <td class="contributor">${name}</td>
+            <td class="date">${date}</td>
+            <td><span class="status-badge ${status}">${label}</span></td>
+        </tr>`;
+    }).join("");
+}
+
+function filterContributions(filter) {
+    document.querySelectorAll(".filter-btn").forEach(b => b.classList.toggle("active", b.dataset.filter === filter));
+    const items = window._allItems || [];
+    if (filter === "all") {
+        renderRows(items);
+    } else {
+        renderRows(items.filter(i => (i.status || "pending").toLowerCase() === filter));
+    }
+}
+
+loadContributions();
+</script>
+</body>
+</html>

@@ -532,7 +532,7 @@ def score_community_policy(policy_text, domain):
     raw = groq_complete(SCORE_PROMPT + policy_text[:15000])
     return ai_parse(raw)
 
-def submit_contribution(domain, policy_url, policy_text, notes):
+def submit_contribution(domain, policy_url, policy_text, notes, contributor_name):
     """Insert a new pending contribution into Supabase."""
     if not SUPABASE_ENABLED:
         return False
@@ -542,15 +542,30 @@ def submit_contribution(domain, policy_url, policy_text, notes):
             "policy_url": policy_url or "",
             "policy_text": policy_text or "",
             "notes": notes or "",
+            "contributor_name": contributor_name or "Anonymous",
             "status": "pending"
         }).execute()
         return True
     except Exception:
         return False
 
+def fetch_contributions():
+    """Fetch all pending contributions ordered by newest first."""
+    if not SUPABASE_ENABLED:
+        return []
+    try:
+        resp = supabase.table("pending_contributions").select("domain,contributor_name,status,submitted_at").order("submitted_at", desc=True).execute()
+        return resp.data or []
+    except Exception:
+        return []
+
 @app.route("/")
 def health():
     return jsonify({"status": "ok"})
+
+@app.route("/contributions")
+def contributions_page():
+    return render_template("contributions.html")
 
 @app.route("/contribute", methods=["POST"])
 def contribute():
@@ -559,6 +574,7 @@ def contribute():
     policy_url = data.get("policy_url", "").strip()
     policy_text = data.get("policy_text", "").strip()
     notes = data.get("notes", "").strip()
+    contributor_name = data.get("contributor_name", "").strip() or "Anonymous"
 
     if not domain:
         return jsonify({"error": "Domain is required."}), 400
@@ -576,11 +592,16 @@ def contribute():
     if not SUPABASE_ENABLED:
         return jsonify({"error": "Contribution system is not configured (missing Supabase credentials)."}), 500
 
-    ok = submit_contribution(domain, policy_url, policy_text, notes)
+    ok = submit_contribution(domain, policy_url, policy_text, notes, contributor_name)
     if not ok:
         return jsonify({"error": "Failed to submit contribution. Try again later."}), 500
 
     return jsonify({"message": f"Thank you! Your contribution for {domain} has been submitted for review."})
+
+@app.route("/api/contributions", methods=["GET"])
+def get_contributions():
+    items = fetch_contributions()
+    return jsonify({"contributions": items})
 
 @app.route("/scan", methods=["POST"])
 def scan():

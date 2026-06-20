@@ -621,6 +621,8 @@ h1 { font-size: 22px; text-align: center; margin-bottom: 4px; font-weight: 700; 
             <div class="contribute-form" id="contributeForm">
                 <label>Domain</label>
                 <input type="text" id="contributeDomain" readonly>
+                <label>Your Name (optional)</label>
+                <input type="text" id="contributeName" placeholder="Anonymous">
                 <label>Privacy Policy URL</label>
                 <input type="url" id="contributeUrl" placeholder="https://example.com/privacy">
                 <label>Paste the policy text (optional if URL provided)</label>
@@ -747,7 +749,11 @@ h1 { font-size: 22px; text-align: center; margin-bottom: 4px; font-weight: 700; 
         </div>
     </div>
 
-    <div class="footer">PrivacyPulse &mdash; Free privacy checker. Not affiliated with any website we scan.</div>
+    <div class="footer">
+        <a href="https://privacy-pulse-w415.onrender.com/contributions" style="color:#22c55e;text-decoration:none;font-weight:600">Community Contributions</a>
+        &nbsp;&bull;&nbsp;
+        PrivacyPulse &mdash; Free privacy checker. Not affiliated with any website we scan.
+    </div>
 </div>
 
 <script>
@@ -1031,6 +1037,7 @@ async function submitContribution() {
     const policyUrl = document.getElementById("contributeUrl").value.trim();
     const policyText = document.getElementById("contributeText").value.trim();
     const notes = document.getElementById("contributeNotes").value.trim();
+    const contributorName = document.getElementById("contributeName").value.trim();
     const btn = document.getElementById("contributeSubmit");
 
     if (!policyUrl && !policyText) {
@@ -1045,7 +1052,7 @@ async function submitContribution() {
         const res = await fetch("https://privacy-pulse-w415.onrender.com/contribute", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ domain, policy_url: policyUrl, policy_text: policyText, notes })
+            body: JSON.stringify({ domain, policy_url: policyUrl, policy_text: policyText, notes, contributor_name: contributorName })
         });
         const data = await res.json();
         if (data.message) {
