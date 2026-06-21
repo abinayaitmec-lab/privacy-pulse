@@ -133,6 +133,9 @@ body {
 #error { display: none; background: rgba(239,68,68,0.08); color: #fca5a5; padding: 16px 20px; border-radius: 12px; margin: 16px 0; font-size: 14px; text-align: center; border: 1px solid rgba(239,68,68,0.15); }
 #errorMsg { white-space: pre-line; }
 #errorUrl { color: #52525b; font-size: 12px; margin-bottom: 4px; }
+#errorContribute input:focus, #errorContribute textarea:focus { border-color: #22c55e !important; box-shadow: 0 0 0 3px rgba(34,197,94,0.06); }
+#errorContribute button:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(34,197,94,0.3); }
+#errorContribute button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
 
 /* ===== SCORING SECTION ===== */
 .section { padding: 60px 0; scroll-margin-top: 80px; }
@@ -427,9 +430,17 @@ body {
             <span>Scanning privacy policy...</span>
         </div>
 
-        <div id="error" style="margin-top:16px">
-            <div id="errorUrl"></div>
-            <div id="errorMsg"></div>
+        <div id="error" style="margin-top:16px;display:none;background:rgba(34,197,94,0.04);border:1px solid rgba(34,197,94,0.1);border-radius:16px;padding:24px">
+            <div id="errorUrl" style="color:#52525b;font-size:12px;margin-bottom:4px"></div>
+            <div id="errorMsg" style="color:#fca5a5;font-size:14px;margin-bottom:16px;white-space:pre-line"></div>
+            <div id="errorContribute" style="display:none">
+                <div style="font-size:15px;font-weight:700;margin-bottom:12px;color:#22c55e">Submit Privacy Policy</div>
+                <input type="text" id="errDomain" readonly style="width:100%;padding:12px 14px;font-size:14px;background:#0a0d16;border:1px solid #27272a;border-radius:10px;color:#63637a;outline:none;font-family:inherit;margin-bottom:10px">
+                <input type="url" id="errPolicyUrl" placeholder="Policy URL (e.g. https://example.com/privacy)" style="width:100%;padding:12px 14px;font-size:14px;background:#0a0d16;border:1px solid #27272a;border-radius:10px;color:#e4e4e7;outline:none;font-family:inherit;margin-bottom:10px;transition:border-color .3s">
+                <textarea id="errPolicyText" placeholder="Or paste the privacy policy text here..." style="width:100%;padding:12px 14px;font-size:14px;background:#0a0d16;border:1px solid #27272a;border-radius:10px;color:#e4e4e7;outline:none;font-family:inherit;min-height:100px;resize:vertical;margin-bottom:12px;transition:border-color .3s"></textarea>
+                <button id="errSubmit" onclick="submitErrorContribution()" style="width:100%;padding:14px;background:linear-gradient(135deg,#22c55e,#16a34a);border:none;border-radius:10px;color:#000;font-size:15px;font-weight:700;cursor:pointer;transition:all .25s">Submit for Analysis</button>
+                <div id="errThanks" style="display:none;padding:16px;background:rgba(34,197,94,0.08);border-radius:10px;color:#22c55e;font-size:14px;font-weight:600;text-align:center;margin-top:12px"></div>
+            </div>
         </div>
     </div>
 </div>
@@ -721,12 +732,6 @@ async function scan() {
     const raw = document.getElementById("urlInput").value.trim();
     if (!raw) return;
 
-    const imgExts = [".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp", ".svg", ".ico"];
-    if (imgExts.some(e => raw.toLowerCase().endsWith(e))) {
-        showError("image.png", "That's an image file, not a website. Please enter a normal URL like example.com");
-        return;
-    }
-
     const btn = document.getElementById("scanBtn");
     const status = document.getElementById("status");
     const error = document.getElementById("error");
@@ -774,9 +779,17 @@ function showError(domain, msg, errorType) {
     msgDisplay.textContent = msg;
     error.style.display = "block";
 
-    if (errorType === "not_found") {
-        document.getElementById("contributeDomain").value = domain || "";
-    }
+    const ec = document.getElementById("errorContribute");
+    const btn = document.getElementById("errSubmit");
+    const thanks = document.getElementById("errThanks");
+    thanks.style.display = "none";
+    btn.style.display = "";
+    btn.disabled = false;
+    btn.textContent = "Submit for Analysis";
+    document.getElementById("errPolicyUrl").value = "";
+    document.getElementById("errPolicyText").value = "";
+    document.getElementById("errDomain").value = domain || "";
+    ec.style.display = "block";
 }
 
 function getCategoryDescription(category, score) {
@@ -988,6 +1001,42 @@ async function submitContribution() {
     } finally {
         btn.disabled = false;
         btn.textContent = "Submit for Analysis";
+    }
+}
+
+async function submitErrorContribution() {
+    const domain = document.getElementById("errDomain").value.trim();
+    const policyUrl = document.getElementById("errPolicyUrl").value.trim();
+    const policyText = document.getElementById("errPolicyText").value.trim();
+    const btn = document.getElementById("errSubmit");
+
+    if (!policyUrl && !policyText) { alert("Please provide a policy URL or paste the policy text."); return; }
+
+    btn.disabled = true;
+    btn.textContent = "Submitting...";
+
+    try {
+        const res = await fetch("https://privacy-pulse-w415.onrender.com/contribute", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ domain, policy_url: policyUrl, policy_text: policyText })
+        });
+        const data = await res.json();
+        if (data.message) {
+            btn.style.display = "none";
+            const thanks = document.getElementById("errThanks");
+            thanks.textContent = data.message + " Thank you for contributing!";
+            thanks.style.display = "block";
+        } else {
+            alert(data.error || "Something went wrong.");
+        }
+    } catch (e) {
+        alert("Network error. Try again.");
+    } finally {
+        if (btn.style.display !== "none") {
+            btn.disabled = false;
+            btn.textContent = "Submit for Analysis";
+        }
     }
 }
 
