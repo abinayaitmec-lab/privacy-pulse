@@ -135,7 +135,7 @@ body {
 #errorUrl { color: #52525b; font-size: 12px; margin-bottom: 4px; }
 
 /* ===== SCORING SECTION ===== */
-.section { padding: 60px 0; }
+.section { padding: 60px 0; scroll-margin-top: 80px; }
 .section-header { text-align: center; margin-bottom: 48px; }
 .section-header p { color: #71717a; font-size: 16px; max-width: 500px; margin: 0 auto; }
 .section-header .section-label {
@@ -395,12 +395,11 @@ body {
             <span class="nav-brand-text">PrivacyPulse</span>
         </a>
         <div class="nav-center">
-            <a href="/" class="nav-link active">Dashboard</a>
-            <a href="#" class="nav-link">Privacy Reports</a>
-            <a href="#" class="nav-link">Compliance</a>
+            <a href="/" class="nav-link active">Home</a>
+            <a href="#watchlistSection" class="nav-link">Privacy Reports</a>
+            <a href="#contributeSection" class="nav-link">Contribution</a>
             <a href="contributions.html" class="nav-link">Community</a>
         </div>
-        <button class="nav-signin">Sign In</button>
     </div>
 </nav>
 
@@ -878,6 +877,9 @@ function renderScorecard(s) {
     document.getElementById("verdictText").textContent = s.verdict || "";
 
     document.getElementById("inputCard").style.display = "none";
+    document.getElementById("scoringSection").style.display = "none";
+    document.getElementById("watchlistSection").style.display = "none";
+    document.getElementById("contributeSection").style.display = "none";
     document.getElementById("scorecard").style.display = "block";
     document.getElementById("scorecard").classList.add("card-entrance");
 
