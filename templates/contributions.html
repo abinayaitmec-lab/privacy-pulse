@@ -11,31 +11,34 @@ body {
     background: #080b14;
     color: #e4e4e7;
     min-height: 100vh;
-    padding: 40px 40px;
 }
-.wrapper { width: 100%; max-width: 1100px; margin: 0 auto; }
+.wrapper { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 40px; }
 
 /* Navbar */
 .navbar {
+    width: 100%; padding: 0; position: relative; z-index: 10;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    background: rgba(8,11,20,0.85); backdrop-filter: blur(12px);
+    position: sticky; top: 0; margin: -40px -40px 40px; padding: 0 40px;
+}
+.nav-inner {
+    max-width: 1200px; margin: 0 auto;
     display: flex; align-items: center; justify-content: space-between;
-    padding: 16px 0; margin-bottom: 40px; border-bottom: 1px solid #1a1c28;
+    height: 64px;
 }
-.nav-left { display: flex; align-items: center; gap: 10px; }
-.nav-brand {
-    display: flex; align-items: center; gap: 8px; text-decoration: none;
-}
+.nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
 .nav-brand-icon {
-    width: 30px; height: 30px;
+    width: 32px; height: 32px;
     background: linear-gradient(135deg, #22c55e, #16a34a);
     border-radius: 8px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 15px;
+    font-size: 16px; font-weight: 700;
 }
-.nav-brand-text { font-size: 17px; font-weight: 800; color: #e4e4e7; letter-spacing: -0.5px; }
-.nav-right { display: flex; gap: 4px; }
+.nav-brand-text { font-size: 18px; font-weight: 800; color: #e4e4e7; letter-spacing: -0.5px; }
+.nav-center { display: flex; gap: 2px; }
 .nav-link {
-    padding: 8px 16px; border-radius: 8px; text-decoration: none;
-    font-size: 13px; font-weight: 600; color: #63637a; transition: all .2s;
+    padding: 8px 18px; border-radius: 8px; text-decoration: none;
+    font-size: 14px; font-weight: 500; color: #63637a; transition: all .2s;
 }
 .nav-link:hover { color: #e4e4e7; background: rgba(255,255,255,0.04); }
 .nav-link.active { color: #22c55e; background: rgba(34,197,94,0.08); }
@@ -88,13 +91,14 @@ td.date { color: #63637a; font-size: 13px; }
     100% { transform: translateX(400%); width: 30%; }
 }
 
-.footer { text-align: center; margin-top: 40px; font-size: 12px; color: #3f3f50; }
+.footer { text-align: center; margin-top: 40px; padding-bottom: 24px; font-size: 12px; color: #3f3f50; border-top: 1px solid rgba(255,255,255,0.04); padding-top: 24px; }
 
 @media (max-width: 768px) {
-    body { padding: 20px 16px; }
+    .wrapper { padding: 0 20px; }
+    .navbar { padding: 0 20px; }
+    .nav-center { display: none; }
     h1 { font-size: 20px; }
     .subtitle { font-size: 13px; }
-    .navbar { flex-wrap: wrap; gap: 8px; }
     td, th { padding: 12px 8px; font-size: 13px; }
     .filter-btn { padding: 6px 14px; font-size: 12px; }
 }
@@ -109,13 +113,15 @@ td.date { color: #63637a; font-size: 13px; }
 <body>
 <div class="wrapper">
     <nav class="navbar">
-        <a href="index.html" class="nav-brand">
-            <div class="nav-brand-icon">🛡️</div>
-            <span class="nav-brand-text">PrivacyPulse</span>
-        </a>
-        <div class="nav-right">
-            <a href="index.html" class="nav-link">Home</a>
-            <a href="contributions.html" class="nav-link active">Contributions</a>
+        <div class="nav-inner">
+            <a href="index.html" class="nav-brand">
+                <div class="nav-brand-icon">🛡️</div>
+                <span class="nav-brand-text">PrivacyPulse</span>
+            </a>
+            <div class="nav-center">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="contributions.html" class="nav-link active">Community</a>
+            </div>
         </div>
     </nav>
 
@@ -153,7 +159,7 @@ td.date { color: #63637a; font-size: 13px; }
         <p>No contributions yet.<br>Be the first to help the community!</p>
     </div>
 
-    <div class="footer"><a href="index.html">PrivacyPulse</a> — Free privacy checker</div>
+    <div class="footer">&copy; 2024 PrivacyPulse — Free privacy checker</div>
 </div>
 
 <script>
