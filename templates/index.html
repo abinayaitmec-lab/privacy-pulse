@@ -8,745 +8,436 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background: #080b14;
     color: #e4e4e7;
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 40px 20px;
-    position: relative;
     overflow-x: hidden;
 }
-
-body::before {
-    content: '';
-    position: fixed;
-    top: 10%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 700px;
-    height: 700px;
-    background: radial-gradient(circle, rgba(34,197,94,0.04) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
-}
-
 .dot-grid {
-    position: fixed;
-    inset: 0;
-    background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);
-    background-size: 28px 28px;
-    pointer-events: none;
-    z-index: 0;
+    position: fixed; inset: 0;
+    background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none; z-index: 0;
+}
+.glow {
+    position: fixed; top: -20%; left: 50%; transform: translateX(-50%);
+    width: 900px; height: 900px;
+    background: radial-gradient(circle, rgba(34,197,94,0.04) 0%, transparent 60%);
+    pointer-events: none; z-index: 0;
 }
 
-.wrapper {
-    width: 100%;
-    max-width: 500px;
+/* ===== NAVBAR ===== */
+.navbar {
+    width: 100%; padding: 0 40px; position: relative; z-index: 10;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    background: rgba(8,11,20,0.85); backdrop-filter: blur(12px);
+    position: sticky; top: 0;
+}
+.nav-inner {
+    max-width: 1200px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px;
+}
+.nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.nav-brand-icon {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700;
+}
+.nav-brand-text { font-size: 18px; font-weight: 800; color: #e4e4e7; letter-spacing: -0.5px; }
+.nav-center { display: flex; gap: 2px; }
+.nav-link {
+    padding: 8px 18px; border-radius: 8px; text-decoration: none;
+    font-size: 14px; font-weight: 500; color: #63637a; transition: all .2s;
+}
+.nav-link:hover { color: #e4e4e7; background: rgba(255,255,255,0.04); }
+.nav-link.active { color: #22c55e; background: rgba(34,197,94,0.08); }
+.nav-signin {
+    padding: 8px 20px; background: linear-gradient(135deg, #22c55e, #16a34a);
+    border: none; border-radius: 8px; color: #000; font-size: 13px; font-weight: 700;
+    cursor: pointer; transition: all .2s;
+}
+.nav-signin:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(34,197,94,0.3); }
+
+/* ===== WRAPPER ===== */
+.wrapper { max-width: 1200px; margin: 0 auto; padding: 0 40px; position: relative; z-index: 1; }
+
+/* ===== HERO ===== */
+.hero {
+    text-align: center; padding: 80px 0 60px;
     position: relative;
-    z-index: 1;
+}
+.hero h1 {
+    font-size: 52px; font-weight: 800; line-height: 1.1; letter-spacing: -1.5px;
+    margin-bottom: 16px;
+}
+.hero h1 span { background: linear-gradient(135deg, #22c55e, #4ade80); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.hero p {
+    font-size: 18px; color: #71717a; max-width: 600px; margin: 0 auto 40px;
+    line-height: 1.6;
 }
 
-.card {
+/* ===== SEARCH ===== */
+.search-section {
+    max-width: 720px; margin: 0 auto;
     background: linear-gradient(145deg, #12141f, #0e101a);
-    border-radius: 28px;
-    padding: 36px;
-    width: 100%;
-    box-shadow: 0 25px 60px -12px rgba(0,0,0,0.8);
-    border: 1px solid rgba(34,197,94,0.15);
-    position: relative;
-    z-index: 1;
+    border-radius: 20px; padding: 32px;
+    border: 1px solid rgba(255,255,255,0.06);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.5);
 }
-
-.card-slim { padding: 32px 36px; }
-
-/* Brand */
-.brand {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 28px;
+.search-input-group {
+    display: flex; gap: 10px;
+    background: #0a0d16; border: 1.5px solid #27272a; border-radius: 12px;
+    padding: 6px 6px 6px 16px; align-items: center; transition: border-color .3s;
 }
-
-.brand-icon {
-    width: 36px;
-    height: 36px;
-    background: linear-gradient(135deg, #22c55e, #16a34a);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.brand-icon svg { width: 20px; height: 20px; color: #000; }
-
-.brand-text {
-    font-size: 20px;
-    font-weight: 800;
+.search-input-group:focus-within { border-color: #22c55e; box-shadow: 0 0 0 3px rgba(34,197,94,0.06); }
+.search-input-group .search-icon { color: #52525b; flex-shrink: 0; }
+.search-input-group input {
+    flex: 1; padding: 14px 10px; font-size: 16px;
+    background: transparent; border: none; outline: none;
     color: #e4e4e7;
-    letter-spacing: -0.5px;
+}
+.search-input-group input::placeholder { color: #52525b; }
+.search-btn {
+    padding: 14px 32px; background: linear-gradient(135deg, #22c55e, #16a34a);
+    border: none; border-radius: 10px; color: #000; font-size: 15px; font-weight: 700;
+    cursor: pointer; transition: all .25s; white-space: nowrap;
+}
+.search-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(34,197,94,0.35); }
+.search-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.search-meta {
+    display: flex; justify-content: center; gap: 24px; margin-top: 20px;
+    font-size: 13px; color: #52525b; flex-wrap: wrap;
+}
+.search-meta span { display: flex; align-items: center; gap: 6px; }
+.search-meta .dot {
+    width: 6px; height: 6px; border-radius: 50%; background: #22c55e; flex-shrink: 0;
 }
 
-h1 { font-size: 22px; text-align: center; margin-bottom: 4px; font-weight: 700; }
-
-.subtitle {
-    color: #71717a;
-    font-size: 13px;
-    text-align: center;
-    margin-bottom: 24px;
-    line-height: 1.5;
-}
-
-/* Input */
-.input-group {
-    display: flex;
-    gap: 8px;
-    position: relative;
-}
-
-.input-group input {
-    flex: 1;
-    padding: 14px 16px 14px 42px;
-    border: 2px solid #27272a;
-    border-radius: 12px;
-    background: #0a0d16;
-    color: #e4e4e7;
-    font-size: 14px;
-    outline: none;
-    transition: all .3s;
-}
-
-.input-group input:focus {
-    border-color: #22c55e;
-    box-shadow: 0 0 0 3px rgba(34,197,94,0.08);
-}
-
-.input-icon {
-    position: absolute;
-    left: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #52525b;
-    pointer-events: none;
-    z-index: 1;
-    display: flex;
-}
-.input-icon svg {
-    width: 16px;
-    height: 16px;
-}
-
-.input-group input::placeholder { color: #52525b; }
-
-.input-group button {
-    padding: 14px 28px;
-    background: linear-gradient(135deg, #22c55e, #16a34a);
-    color: #000;
-    border: none;
-    border-radius: 12px;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all .25s;
-    white-space: nowrap;
-}
-
-.input-group button:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 8px 25px -8px rgba(34,197,94,0.4);
-}
-
-.input-group button:active { transform: translateY(0); }
-.input-group button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
-
-/* Badge pills */
-.badges {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    margin-top: 16px;
-    flex-wrap: wrap;
-}
-
-.badge-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    background: #0a0d16;
-    border: 1px solid #1f2230;
-    border-radius: 20px;
-    padding: 5px 12px;
-    font-size: 11px;
-    color: #71717a;
-    white-space: nowrap;
-}
-
-.badge-pill svg { width: 12px; height: 12px; }
-
-/* Recent scans */
-.recent-row {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    margin-top: 16px;
-    font-size: 11px;
-    color: #52525b;
-    flex-wrap: wrap;
-}
-
-.recent-label { color: #52525b; }
-
-.recent-chip {
-    color: #63637a;
-    cursor: pointer;
-    transition: color .2s;
-    text-decoration: none;
-}
-
-.recent-chip:hover { color: #22c55e; }
-
-.recent-sep { color: #27272a; }
-
-/* Status */
-#status {
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    margin: 24px 0;
-    color: #71717a;
-    font-size: 13px;
-}
-
-.loading-bar {
-    width: 200px;
-    height: 3px;
-    background: #1a1c28;
-    border-radius: 2px;
-    overflow: hidden;
-}
-
-.loading-bar-fill {
-    height: 100%;
-    width: 30%;
-    background: linear-gradient(90deg, #22c55e, #4ade80);
-    border-radius: 2px;
-    animation: loadingSlide 1.2s ease-in-out infinite;
-}
-
+/* ===== STATUS ===== */
+#status { display: none; flex-direction: column; align-items: center; gap: 12px; margin: 24px 0; color: #71717a; font-size: 14px; }
+.loading-bar { width: 220px; height: 3px; background: #1a1c28; border-radius: 2px; overflow: hidden; }
+.loading-bar-fill { height: 100%; width: 30%; background: linear-gradient(90deg, #22c55e, #4ade80); border-radius: 2px; animation: loadingSlide 1.2s ease-in-out infinite; }
 @keyframes loadingSlide {
     0% { transform: translateX(-100%); width: 30%; }
     50% { width: 60%; }
     100% { transform: translateX(400%); width: 30%; }
 }
 
-/* Error */
-#error {
-    display: none;
-    background: rgba(239,68,68,0.08);
-    color: #fca5a5;
-    padding: 14px 16px;
-    border-radius: 12px;
-    margin: 16px 0;
-    font-size: 13px;
-    text-align: center;
-    border: 1px solid rgba(239,68,68,0.15);
-}
+/* ===== ERROR ===== */
+#error { display: none; background: rgba(239,68,68,0.08); color: #fca5a5; padding: 16px 20px; border-radius: 12px; margin: 16px 0; font-size: 14px; text-align: center; border: 1px solid rgba(239,68,68,0.15); }
 #errorMsg { white-space: pre-line; }
+#errorUrl { color: #52525b; font-size: 12px; margin-bottom: 4px; }
 
-/* Popular sites */
-.popular-section { margin-top: 32px; }
-.popular-title { font-size: 15px; font-weight: 700; color: #e4e4e7; margin-bottom: 4px; text-align: center; }
-.popular-subtitle { font-size: 12px; color: #52525b; margin-bottom: 20px; text-align: center; }
-.popular-grid { display: flex; gap: 24px; }
-.popular-card {
-    flex: 1;
-    min-height: 220px;
-    background: #0e111c;
-    border: 1px solid #27272a;
-    border-left: 4px solid #27272a;
-    border-radius: 14px;
-    padding: 20px;
-    cursor: pointer;
-    transition: all .25s;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
+/* ===== SCORING SECTION ===== */
+.section { padding: 60px 0; }
+.section-header { text-align: center; margin-bottom: 48px; }
+.section-header p { color: #71717a; font-size: 16px; max-width: 500px; margin: 0 auto; }
+.section-header .section-label {
+    display: inline-block; font-size: 12px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1.5px; color: #52525b; margin-bottom: 12px;
 }
-.popular-card:hover { transform: scale(1.03); }
-.popular-card-top { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
-.popular-card-favicon { width: 20px; height: 20px; border-radius: 4px; }
-.popular-card-name { font-size: 14px; font-weight: 700; color: #e4e4e7; }
-.popular-card-middle { flex: 1; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
-.popular-card-ring {
-    width: 104px;
-    height: 104px;
-    border-radius: 50%;
-    border: 3px solid;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.popular-card-score { font-size: 48px; font-weight: 800; line-height: 1; }
-.popular-card-bottom { text-align: center; }
-.popular-card-badge {
-    display: inline-block;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 4px 12px;
-    border-radius: 20px;
-    margin-bottom: 4px;
-}
-.popular-card-desc { font-size: 11px; color: #63637a; line-height: 1.4; }
+.section-header h2 { font-size: 28px; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.5px; }
 
-/* Contribution form */
-.contribute-section { margin-top: 20px; text-align: center; display: none; }
-.contribute-btn {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: linear-gradient(135deg, #22c55e, #16a34a); color: #000;
-    border: none; padding: 12px 24px; border-radius: 12px;
-    font-size: 14px; font-weight: 700; cursor: pointer;
-    transition: all .25s;
+.feature-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+.feature-card {
+    background: linear-gradient(145deg, #12141f, #0e101a);
+    border: 1px solid rgba(34,197,94,0.06);
+    border-radius: 16px; padding: 28px 16px; text-align: center;
+    transition: all .3s; cursor: default;
 }
-.contribute-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 25px -8px rgba(34,197,94,0.4); }
-.contribute-form { display: none; margin-top: 16px; text-align: left; }
+.feature-card:hover { transform: translateY(-4px); border-color: rgba(34,197,94,0.2); box-shadow: 0 12px 32px rgba(0,0,0,0.3); }
+.feature-icon-wrap {
+    width: 48px; height: 48px; border-radius: 12px;
+    background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.12);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px; color: #22c55e;
+}
+.feature-card h3 { font-size: 14px; font-weight: 700; margin-bottom: 8px; color: #e4e4e7; }
+.feature-card p { font-size: 13px; color: #63637a; line-height: 1.5; }
+
+/* ===== COMMUNITY WATCHLIST ===== */
+.watchlist-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 32px; flex-wrap: wrap; gap: 12px;
+}
+.watchlist-header-left h2 { font-size: 28px; font-weight: 800; margin-bottom: 4px; }
+.watchlist-header-left p { color: #71717a; font-size: 14px; }
+.watchlist-header-right a {
+    color: #22c55e; text-decoration: none; font-size: 14px; font-weight: 600;
+    display: flex; align-items: center; gap: 6px; transition: gap .2s;
+}
+.watchlist-header-right a:hover { gap: 10px; }
+
+.watchlist-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.wl-card {
+    background: linear-gradient(145deg, #12141f, #0e101a);
+    border: 1px solid rgba(255,255,255,0.04);
+    border-radius: 20px; padding: 28px; cursor: pointer;
+    transition: all .3s; position: relative; overflow: hidden;
+}
+.wl-card:hover { transform: translateY(-4px); border-color: rgba(34,197,94,0.15); box-shadow: 0 12px 32px rgba(0,0,0,0.3); }
+.wl-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+.wl-card-left { display: flex; align-items: center; gap: 12px; }
+.wl-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px; color: #000;
+}
+.wl-name { font-size: 16px; font-weight: 700; }
+.wl-card-middle { display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
+.wl-ring-wrap {
+    position: relative; width: 100px; height: 100px;
+}
+.wl-ring-wrap svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.wl-ring-bg { fill: none; stroke: #1a1c28; stroke-width: 5; }
+.wl-ring-fill { fill: none; stroke-width: 5; stroke-linecap: round; transition: stroke-dashoffset 1s ease; }
+.wl-score {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    font-size: 28px; font-weight: 800;
+}
+.wl-card-bottom { text-align: left; }
+.wl-desc { font-size: 13px; color: #63637a; line-height: 1.5; margin-bottom: 12px; }
+.wl-badge {
+    display: inline-block; font-size: 11px; font-weight: 700;
+    padding: 4px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px;
+}
+
+/* ===== CONTRIBUTION ===== */
+.contribute-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; }
+.contribute-left h2 { font-size: 36px; font-weight: 800; margin-bottom: 16px; line-height: 1.2; }
+.contribute-left p { color: #71717a; font-size: 15px; line-height: 1.6; margin-bottom: 28px; }
+.contribute-benefits { display: flex; flex-direction: column; gap: 14px; }
+.contribute-benefits .benefit {
+    display: flex; align-items: center; gap: 12px; font-size: 15px; color: #a1a1aa;
+}
+.contribute-benefits .benefit .check-icon {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: rgba(34,197,94,0.12); display: flex; align-items: center; justify-content: center;
+    color: #22c55e; flex-shrink: 0;
+}
+
+.contribute-form-card {
+    background: linear-gradient(145deg, #12141f, #0e101a);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 20px; padding: 32px;
+}
+.contribute-form { display: flex; flex-direction: column; gap: 16px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.contribute-form label { font-size: 12px; font-weight: 700; color: #52525b; text-transform: uppercase; letter-spacing: 0.5px; }
 .contribute-form input, .contribute-form textarea {
-    width: 100%; padding: 10px 14px; margin-bottom: 10px;
+    width: 100%; padding: 14px 16px; font-size: 14px;
     background: #0a0d16; border: 1px solid #27272a; border-radius: 10px;
-    color: #e4e4e7; font-size: 13px; outline: none;
-    font-family: inherit; box-sizing: border-box;
+    color: #e4e4e7; outline: none; font-family: inherit; transition: all .3s;
 }
-.contribute-form input:focus, .contribute-form textarea:focus {
-    border-color: #22c55e; box-shadow: 0 0 0 3px rgba(34,197,94,0.08);
-}
-.contribute-form textarea { min-height: 100px; resize: vertical; }
-.contribute-form label { font-size: 12px; font-weight: 600; color: #a1a1aa; margin-bottom: 4px; display: block; }
+.contribute-form input::placeholder, .contribute-form textarea::placeholder { color: #3f3f50; }
+.contribute-form input:focus, .contribute-form textarea:focus { border-color: #22c55e; box-shadow: 0 0 0 3px rgba(34,197,94,0.06); }
+.contribute-form textarea { min-height: 120px; resize: vertical; }
 .contribute-submit {
-    width: 100%; padding: 12px; background: linear-gradient(135deg, #22c55e, #16a34a);
-    color: #000; border: none; border-radius: 10px; font-size: 14px; font-weight: 700;
-    cursor: pointer; transition: all .25s;
+    padding: 16px; background: linear-gradient(135deg, #22c55e, #16a34a);
+    border: none; border-radius: 12px; color: #000; font-size: 15px; font-weight: 700;
+    cursor: pointer; transition: all .25s; width: 100%;
 }
-.contribute-submit:hover { transform: translateY(-1px); box-shadow: 0 8px 25px -8px rgba(34,197,94,0.4); }
-.contribute-submit:disabled { opacity: 0.4; cursor: not-allowed; }
-.contribute-thanks { display: none; margin-top: 16px; padding: 16px; background: rgba(34,197,94,0.08); border-radius: 12px; color: #22c55e; font-size: 14px; font-weight: 600; text-align: center; }
+.contribute-submit:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(34,197,94,0.3); }
+.contribute-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+.contribute-thanks { display: none; padding: 20px; background: rgba(34,197,94,0.08); border-radius: 12px; color: #22c55e; font-size: 15px; font-weight: 600; text-align: center; }
 
-/* Source badge */
-.source-badge {
-    display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 8px;
-    border-radius: 5px; margin-left: 6px; letter-spacing: 0.3px;
+/* ===== SCORECARD (results) ===== */
+.scorecard-wrapper { max-width: 600px; margin: 40px auto; }
+#scorecard { display: none; }
+.scorecard-card {
+    background: linear-gradient(145deg, #12141f, #0e101a);
+    border-radius: 24px; padding: 36px;
+    border: 1px solid rgba(34,197,94,0.12);
+    box-shadow: 0 24px 48px rgba(0,0,0,0.4);
 }
+.scorecard-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid #1a1c28; }
+.scorecard-brand { display: flex; align-items: center; gap: 6px; }
+.scorecard-brand svg { width: 16px; height: 16px; color: #22c55e; }
+.scorecard-brand-text { font-size: 12px; font-weight: 700; color: #22c55e; letter-spacing: 0.5px; }
+.scorecard-site-area { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.site-name { font-size: 16px; font-weight: 700; }
+.grade-badge { font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 5px; color: #000; letter-spacing: 0.5px; }
+.source-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 5px; margin-left: 6px; letter-spacing: 0.3px; }
 .source-badge.expert { background: rgba(34,197,94,0.15); color: #22c55e; }
 .source-badge.community { background: rgba(139,92,246,0.15); color: #a78bfa; }
 .source-badge.live { background: rgba(59,130,246,0.15); color: #60a5fa; }
 
-/* Empty state */
-.empty-state { text-align: center; padding: 32px 20px; color: #52525b; font-size: 14px; }
-
-/* Scorecard */
-.scorecard-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 24px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #1a1c28;
-}
-
-.scorecard-brand {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.scorecard-brand svg { width: 16px; height: 16px; color: #22c55e; }
-.scorecard-brand-text { font-size: 12px; font-weight: 700; color: #22c55e; letter-spacing: 0.5px; }
-
-.scorecard-site-area {
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.site-name { font-size: 16px; font-weight: 700; }
-
-.grade-badge {
-    font-size: 10px;
-    font-weight: 800;
-    padding: 3px 8px;
-    border-radius: 5px;
-    color: #000;
-    letter-spacing: 0.5px;
-}
-
 .score-section { text-align: center; margin-bottom: 28px; }
-
-.score-ring {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 8px;
-}
-
-.score-ring svg { transform: rotate(-90deg); width: 110px; height: 110px; }
-.score-ring-bg { fill: none; stroke: #1a1c28; stroke-width: 5; }
-.score-ring-fill { fill: none; stroke-width: 5; stroke-linecap: round; transition: stroke-dashoffset 1s ease, stroke .5s; }
-
-.score-number {
-    position: absolute;
-    font-size: 32px;
-    font-weight: 800;
-    line-height: 1;
-}
-
-.score-label {
-    color: #63637a;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-}
-
-.verdict-line { color: #a1a1aa; font-size: 14px; margin-top: 6px; }
+.score-ring { position: relative; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+.score-ring svg { transform: rotate(-90deg); width: 120px; height: 120px; }
+.score-ring-bg { fill: none; stroke: #1a1c28; stroke-width: 6; }
+.score-ring-fill { fill: none; stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 1s ease, stroke .5s; }
+.score-number { position: absolute; font-size: 36px; font-weight: 800; line-height: 1; }
+.score-label { color: #63637a; font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; }
+.verdict-line { color: #a1a1aa; font-size: 15px; margin-top: 8px; }
 
 .categories { display: flex; flex-direction: column; gap: 18px; margin-bottom: 28px; }
 .category-row { display: flex; flex-direction: column; gap: 5px; }
 .category-header { display: flex; justify-content: space-between; align-items: center; }
-.category-name { font-size: 13px; font-weight: 600; color: #d4d4d8; }
-.category-score { font-size: 13px; font-weight: 700; }
+.category-name { font-size: 14px; font-weight: 600; color: #d4d4d8; }
+.category-score { font-size: 14px; font-weight: 700; }
+.bar-track { width: 100%; height: 9px; background: #1a1c28; border-radius: 5px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 5px; transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; }
+.bar-fill::after { content: ''; position: absolute; right: 0; top: 0; width: 20px; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15)); border-radius: 5px; }
+.bar-explanation { color: #63637a; font-size: 13px; line-height: 1.4; }
 
-.bar-track {
-    width: 100%;
-    height: 8px;
-    background: #1a1c28;
-    border-radius: 4px;
-    overflow: hidden;
-}
-
-.bar-fill {
-    height: 100%;
-    border-radius: 4px;
-    transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
-    position: relative;
-}
-
-.bar-fill::after {
-    content: '';
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: 20px;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15));
-    border-radius: 4px;
-}
-
-.bar-explanation { color: #63637a; font-size: 12px; line-height: 1.4; }
-
-.verdict-box {
-    background: linear-gradient(135deg, #161824, #1a1c28);
-    border-radius: 14px;
-    padding: 18px;
-    text-align: center;
-    margin-bottom: 24px;
-    border: 1px solid rgba(34,197,94,0.1);
-}
-
-.verdict-emoji { display: block; margin-bottom: 6px; font-size: 28px; line-height: 1; }
-
-.verdict-text { font-size: 15px; font-weight: 700; color: #e4e4e7; }
+.verdict-box { background: linear-gradient(135deg, #161824, #1a1c28); border-radius: 14px; padding: 20px; text-align: center; margin-bottom: 24px; border: 1px solid rgba(34,197,94,0.1); }
+.verdict-emoji { display: block; margin-bottom: 6px; font-size: 30px; line-height: 1; }
+.verdict-text { font-size: 16px; font-weight: 700; color: #e4e4e7; }
 
 .bottom-row { display: flex; justify-content: space-between; }
-
 .share-btn, .back-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: transparent;
-    border: 1px solid #27272a;
-    color: #63637a;
-    padding: 10px 22px;
-    border-radius: 10px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all .25s;
+    display: inline-flex; align-items: center; gap: 6px;
+    background: transparent; border: 1px solid #27272a; color: #63637a;
+    padding: 12px 24px; border-radius: 10px; font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: all .25s;
 }
-
-.share-btn:hover, .back-btn:hover {
-    border-color: #22c55e;
-    color: #22c55e;
-    background: rgba(34,197,94,0.04);
-}
-
+.share-btn:hover, .back-btn:hover { border-color: #22c55e; color: #22c55e; background: rgba(34,197,94,0.04); }
 .share-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .back-btn:hover { border-color: #63637a; color: #a1a1aa; background: transparent; }
 
-/* Footer */
+/* ===== FOOTER ===== */
 .footer {
-    text-align: center;
-    margin-top: 24px;
-    font-size: 11px;
-    color: #3f3f50;
-    padding-bottom: 20px;
+    border-top: 1px solid rgba(255,255,255,0.04);
+    padding: 60px 40px 0; margin-top: 60px;
 }
-
-/* Entrance animation */
-@keyframes scaleIn {
-    from { opacity: 0; transform: scale(0.92) translateY(12px); }
-    to { opacity: 1; transform: scale(1) translateY(0); }
-}
-
-.card-entrance {
-    animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-}
-
-@media (max-width: 540px) {
-    body { padding: 16px 12px; }
-    .card, .card-slim { padding: 20px; border-radius: 20px; }
-    .wrapper { max-width: 100%; }
-
-    .brand { margin-bottom: 20px; }
-    .brand-icon { width: 30px; height: 30px; }
-    .brand-icon svg { width: 16px; height: 16px; }
-    .brand-text { font-size: 17px; }
-
-    h1 { font-size: 18px; }
-    .subtitle { font-size: 12px; margin-bottom: 18px; }
-
-    .input-group input { padding: 12px 14px 12px 38px; font-size: 13px; }
-    .input-group button { padding: 12px 20px; font-size: 13px; }
-
-    #status { margin: 18px 0; font-size: 12px; }
-    .loading-bar { width: 140px; }
-
-    .badges { gap: 6px; margin-top: 12px; }
-    .badge-pill { font-size: 10px; padding: 4px 10px; }
-
-    .recent-row { font-size: 10px; gap: 4px; }
-
-    .scorecard-header { flex-wrap: wrap; gap: 8px; padding-bottom: 16px; margin-bottom: 20px; }
-    .scorecard-site-area { margin-left: 0; }
-
-    .popular-grid { flex-direction: column; }
-
-    .score-ring svg { width: 90px; height: 90px; }
-    .score-number { font-size: 26px; }
-
-    .categories { gap: 14px; margin-bottom: 22px; }
-    .category-name { font-size: 12px; }
-    .category-score { font-size: 12px; }
-    .bar-track { height: 7px; }
-    .bar-explanation { font-size: 11px; }
-
-    .verdict-box { padding: 14px; }
-    .verdict-text { font-size: 14px; }
-    .verdict-emoji { font-size: 24px; }
-
-    .share-btn, .back-btn { padding: 8px 16px; font-size: 12px; }
-    .footer { font-size: 10px; margin-top: 18px; }
-    .navbar { max-width: 100%; flex-wrap: wrap; gap: 6px; }
-}
-
-@media (max-width: 380px) {
-    body { padding: 12px 8px; }
-    .card, .card-slim { padding: 16px; border-radius: 16px; }
-
-    .brand-icon { width: 26px; height: 26px; }
-    .brand-icon svg { width: 14px; height: 14px; }
-    .brand-text { font-size: 15px; }
-
-    h1 { font-size: 16px; }
-    .subtitle { font-size: 11px; }
-
-    .input-group { flex-direction: column; }
-    .input-group input { padding: 12px 14px 12px 38px; }
-    .input-group button { width: 100%; }
-
-    .score-ring svg { width: 76px; height: 76px; }
-    .score-number { font-size: 22px; }
-    .score-label { font-size: 10px; }
-
-    .badge-pill { font-size: 9px; padding: 3px 8px; }
-    .recent-row { font-size: 9px; }
-
-    .categories { gap: 12px; }
-    .bar-track { height: 6px; }
-}
-
-@media (min-width: 768px) {
-    body { padding: 60px 40px; }
-}
-
-/* Navbar */
-.navbar {
-    width: 100%; max-width: 540px; margin: 0 auto 24px;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 12px 0; border-bottom: 1px solid #1a1c28;
-    position: relative; z-index: 1;
-}
-.nav-brand {
-    display: flex; align-items: center; gap: 8px; text-decoration: none;
-}
-.nav-brand-icon {
-    width: 28px; height: 28px;
-    background: linear-gradient(135deg, #22c55e, #16a34a);
-    border-radius: 7px;
+.footer-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; }
+.footer-brand .nav-brand-text { font-size: 16px; }
+.footer-brand p { color: #63637a; font-size: 13px; line-height: 1.6; margin-top: 12px; max-width: 280px; }
+.footer-social { display: flex; gap: 12px; margin-top: 16px; }
+.footer-social a {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
     display: flex; align-items: center; justify-content: center;
-    font-size: 14px;
+    color: #63637a; text-decoration: none; transition: all .2s;
 }
-.nav-brand-text { font-size: 16px; font-weight: 800; color: #e4e4e7; letter-spacing: -0.5px; }
-.nav-right { display: flex; gap: 4px; }
-.nav-link {
-    padding: 7px 14px; border-radius: 8px; text-decoration: none;
-    font-size: 12px; font-weight: 600; color: #63637a; transition: all .2s;
+.footer-social a:hover { color: #22c55e; border-color: rgba(34,197,94,0.2); }
+.footer-col h4 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #52525b; margin-bottom: 16px; }
+.footer-col a { display: block; color: #63637a; text-decoration: none; font-size: 13px; padding: 4px 0; transition: color .2s; }
+.footer-col a:hover { color: #22c55e; }
+.footer-bottom {
+    max-width: 1200px; margin: 0 auto; padding: 24px 0;
+    margin-top: 40px; border-top: 1px solid rgba(255,255,255,0.04);
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 12px; color: #3f3f50; flex-wrap: wrap; gap: 8px;
 }
-.nav-link:hover { color: #e4e4e7; background: rgba(255,255,255,0.04); }
-.nav-link.active { color: #22c55e; background: rgba(34,197,94,0.08); }
+.footer-bottom-right { display: flex; align-items: center; gap: 6px; }
+.footer-status-dot {
+    width: 6px; height: 6px; border-radius: 50%; background: #22c55e;
+}
+.footer-bottom a { color: #3f3f50; text-decoration: none; }
+.footer-bottom a:hover { color: #22c55e; }
+
+/* ===== ANIMATIONS ===== */
+@keyframes scaleIn { from { opacity: 0; transform: scale(0.92) translateY(12px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+.card-entrance { animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+    .feature-grid { grid-template-columns: repeat(3, 1fr); }
+    .footer-inner { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 768px) {
+    .hero h1 { font-size: 34px; }
+    .hero p { font-size: 16px; }
+    .hero { padding: 60px 0 40px; }
+    .search-section { padding: 24px; }
+    .search-input-group { flex-direction: column; padding: 12px; gap: 10px; }
+    .search-input-group .search-icon { display: none; }
+    .search-btn { width: 100%; justify-content: center; }
+    .feature-grid { grid-template-columns: repeat(2, 1fr); }
+    .watchlist-grid { grid-template-columns: 1fr; }
+    .contribute-grid { grid-template-columns: 1fr; gap: 32px; }
+    .navbar { padding: 0 20px; }
+    .wrapper { padding: 0 20px; }
+    .footer { padding: 40px 20px 0; }
+    .footer-inner { grid-template-columns: 1fr; gap: 32px; }
+    .nav-center { display: none; }
+    .section-header h2 { font-size: 26px; }
+    .watchlist-header-left h2 { font-size: 24px; }
+    .contribute-left h2 { font-size: 28px; }
+    .scorecard-card { padding: 24px; }
+}
+@media (max-width: 540px) {
+    .hero h1 { font-size: 28px; }
+    .hero p { font-size: 14px; }
+    .search-section { padding: 16px; border-radius: 16px; }
+    .search-input-group input { padding: 12px 8px; font-size: 14px; }
+    .search-btn { padding: 14px 24px; font-size: 14px; }
+    .feature-grid { grid-template-columns: 1fr; }
+    .watchlist-grid { gap: 16px; }
+    .wl-card { padding: 20px; }
+    .scorecard-card { padding: 20px; border-radius: 18px; }
+    .score-ring svg { width: 100px; height: 100px; }
+    .score-number { font-size: 30px; }
+    .categories { gap: 14px; }
+    .share-btn, .back-btn { padding: 10px 18px; font-size: 13px; }
+    .footer-bottom { flex-direction: column; text-align: center; }
+    .form-row { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
 <div class="dot-grid"></div>
+<div class="glow"></div>
 
+<!-- ===== NAVBAR ===== -->
 <nav class="navbar">
-    <a href="/" class="nav-brand">
-        <div class="nav-brand-icon">🛡️</div>
-        <span class="nav-brand-text">PrivacyPulse</span>
-    </a>
-    <div class="nav-right">
-        <a href="/" class="nav-link active">Home</a>
-        <a href="contributions.html" class="nav-link">Contributions</a>
+    <div class="nav-inner">
+        <a href="/" class="nav-brand">
+            <div class="nav-brand-icon">🛡️</div>
+            <span class="nav-brand-text">PrivacyPulse</span>
+        </a>
+        <div class="nav-center">
+            <a href="/" class="nav-link active">Dashboard</a>
+            <a href="#" class="nav-link">Privacy Reports</a>
+            <a href="#" class="nav-link">Compliance</a>
+            <a href="contributions.html" class="nav-link">Community</a>
+        </div>
+        <button class="nav-signin">Sign In</button>
     </div>
 </nav>
 
 <div class="wrapper">
-    <div class="card card-slim" id="inputCard">
-        <div class="brand">
-            <div class="brand-icon" data-lucide="shield"></div>
-            <span class="brand-text">PrivacyPulse</span>
-        </div>
-        <h1>Check any site's privacy</h1>
-        <p class="subtitle">Paste any URL. Get a plain English privacy score in seconds. No jargon.</p>
 
-        <div class="input-group">
-            <span class="input-icon" data-lucide="search"></span>
-            <input type="text" id="urlInput" placeholder="example.com" autofocus>
-            <button id="scanBtn" onclick="scan()">Scan</button>
+<!-- ===== HERO ===== -->
+<div class="hero" id="inputCard">
+    <h1>Know What Websites<br>Do With <span>Your Data</span></h1>
+    <p>Analyze privacy policies, tracking practices, data sharing, and user rights in seconds.</p>
+
+    <div class="search-section">
+        <div class="search-input-group">
+            <span class="search-icon" data-lucide="search" style="width:20px;height:20px"></span>
+            <input type="text" id="urlInput" placeholder="Enter a website URL (e.g. facebook.com)" autofocus>
+            <button class="search-btn" id="scanBtn" onclick="scan()">Scan Site</button>
+        </div>
+        <div class="search-meta">
+            <span><span class="dot"></span> 10,000+ Sites Scanned</span>
+            <span><span class="dot"></span> Free Forever</span>
+            <span><span class="dot"></span> Results in 5s</span>
         </div>
 
-        <div id="status">
+        <div id="status" style="margin-top:20px">
             <div class="loading-bar"><div class="loading-bar-fill"></div></div>
             <span>Scanning privacy policy...</span>
         </div>
 
-        <div id="error">
-            <div id="errorUrl" style="color:#52525b;font-size:11px;margin-bottom:4px"></div>
+        <div id="error" style="margin-top:16px">
+            <div id="errorUrl"></div>
             <div id="errorMsg"></div>
         </div>
-
-        <div class="contribute-section" id="contributeSection">
-            <button class="contribute-btn" id="contributeBtn" onclick="showContributeForm()">
-                Contribute Privacy Policy
-            </button>
-            <div class="contribute-form" id="contributeForm">
-                <label>Domain</label>
-                <input type="text" id="contributeDomain" readonly>
-                <label>Your Name (optional)</label>
-                <input type="text" id="contributeName" placeholder="Anonymous">
-                <label>Privacy Policy URL</label>
-                <input type="url" id="contributeUrl" placeholder="https://example.com/privacy">
-                <label>Paste the policy text (optional if URL provided)</label>
-                <textarea id="contributeText" placeholder="Paste the full privacy policy text here..."></textarea>
-                <label>Notes (optional)</label>
-                <input type="text" id="contributeNotes" placeholder="Any extra info?">
-                <button class="contribute-submit" id="contributeSubmit" onclick="submitContribution()">Submit</button>
-            </div>
-            <div class="contribute-thanks" id="contributeThanks"></div>
-        </div>
-
-        <div class="badges">
-            <span class="badge-pill"><span data-lucide="search" style="width:12px;height:12px;color:#22c55e"></span> 10,000+ Sites Scanned</span>
-            <span class="badge-pill"><span data-lucide="shield" style="width:12px;height:12px;color:#22c55e"></span> Free Forever</span>
-            <span class="badge-pill"><span data-lucide="zap" style="width:12px;height:12px;color:#22c55e"></span> Results in 5s</span>
-        </div>
-
-        <div class="recent-row">
-            <span class="recent-label">Recently checked:</span>
-            <a class="recent-chip" onclick="fillUrl('facebook.com')">facebook.com</a>
-            <span class="recent-sep">&bull;</span>
-            <a class="recent-chip" onclick="fillUrl('zomato.com')">zomato.com</a>
-            <span class="recent-sep">&bull;</span>
-            <a class="recent-chip" onclick="fillUrl('google.com')">google.com</a>
-            <span class="recent-sep">&bull;</span>
-            <a class="recent-chip" onclick="fillUrl('signal.org')">signal.org</a>
-        </div>
-
-        <div class="empty-state" id="emptyState">
-            <span id="emptyUrl" style="color:#52525b;font-size:11px;display:block;margin-bottom:4px"></span>
-            Enter a URL above to see its privacy score
-        </div>
     </div>
+</div>
 
-    <div class="popular-section">
-        <div class="popular-title">Popular Sites Privacy Scores</div>
-        <div class="popular-subtitle">See how the sites you use every day score on privacy</div>
-        <div class="popular-grid">
-            <div class="popular-card" onclick="fillUrl('signal.org')" style="border-left-color:#22c55e;box-shadow:0 0 0 0 transparent" onmouseover="this.style.boxShadow='0 0 24px -4px rgba(34,197,94,0.25)'" onmouseout="this.style.boxShadow='0 0 0 0 transparent'">
-                <div class="popular-card-top">
-                    <img class="popular-card-favicon" src="https://www.google.com/s2/favicons?domain=signal.org&sz=32" alt="">
-                    <div class="popular-card-name">signal.org</div>
-                </div>
-                <div class="popular-card-middle">
-                    <div class="popular-card-ring" style="border-color:#22c55e">
-                        <div class="popular-card-score" style="color:#22c55e">9</div>
-                    </div>
-                </div>
-                <div class="popular-card-bottom">
-                    <div class="popular-card-badge" style="background:#22c55e18;color:#22c55e">🟢 Privacy Safe</div>
-                    <div class="popular-card-desc">No tracking. Your data stays yours.</div>
-                </div>
-            </div>
-            <div class="popular-card" onclick="fillUrl('zomato.com')" style="border-left-color:#eab308;box-shadow:0 0 0 0 transparent" onmouseover="this.style.boxShadow='0 0 24px -4px rgba(234,179,8,0.25)'" onmouseout="this.style.boxShadow='0 0 0 0 transparent'">
-                <div class="popular-card-top">
-                    <img class="popular-card-favicon" src="https://www.google.com/s2/favicons?domain=zomato.com&sz=32" alt="">
-                    <div class="popular-card-name">zomato.com</div>
-                </div>
-                <div class="popular-card-middle">
-                    <div class="popular-card-ring" style="border-color:#eab308">
-                        <div class="popular-card-score" style="color:#eab308">5</div>
-                    </div>
-                </div>
-                <div class="popular-card-bottom">
-                    <div class="popular-card-badge" style="background:#eab30818;color:#eab308">🟡 Use Caution</div>
-                    <div class="popular-card-desc">Shares order data and location with partners.</div>
-                </div>
-            </div>
-            <div class="popular-card" onclick="fillUrl('facebook.com')" style="border-left-color:#ef4444;box-shadow:0 0 0 0 transparent" onmouseover="this.style.boxShadow='0 0 24px -4px rgba(239,68,68,0.25)'" onmouseout="this.style.boxShadow='0 0 0 0 transparent'">
-                <div class="popular-card-top">
-                    <img class="popular-card-favicon" src="https://www.google.com/s2/favicons?domain=facebook.com&sz=32" alt="">
-                    <div class="popular-card-name">facebook.com</div>
-                </div>
-                <div class="popular-card-middle">
-                    <div class="popular-card-ring" style="border-color:#ef4444">
-                        <div class="popular-card-score" style="color:#ef4444">2</div>
-                    </div>
-                </div>
-                <div class="popular-card-bottom">
-                    <div class="popular-card-badge" style="background:#ef444418;color:#ef4444">🔴 High Risk</div>
-                    <div class="popular-card-desc">Extensive tracking and data sharing with third parties.</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="card" id="scorecard" style="display:none">
+<!-- ===== SCORECARD ===== -->
+<div class="scorecard-wrapper" id="scorecard" style="display:none">
+    <div class="scorecard-card">
         <div id="captureArea">
             <div class="scorecard-header">
                 <div class="scorecard-brand">
@@ -785,11 +476,221 @@ h1 { font-size: 22px; text-align: center; margin-bottom: 4px; font-weight: 700; 
             </button>
         </div>
     </div>
+</div>
 
-    <div class="footer">
-        <a href="https://privacy-pulse-w415.onrender.com/contributions" style="color:#22c55e;text-decoration:none;font-weight:600">Community Contributions</a>
-        &nbsp;&bull;&nbsp;
-        PrivacyPulse &mdash; Free privacy checker. Not affiliated with any website we scan.
+<!-- ===== HOW WE SCORE ===== -->
+<div class="section" id="scoringSection">
+    <div class="section-header">
+        <h2>How PrivacyPulse Scores Websites</h2>
+        <p>Our AI engine evaluates platforms across five core privacy dimensions.</p>
+    </div>
+    <div class="feature-grid">
+        <div class="feature-card">
+            <div class="feature-icon-wrap">
+                <span data-lucide="search" style="width:22px;height:22px"></span>
+            </div>
+            <h3>Data Collection</h3>
+            <p>Quantity and sensitivity of data harvested.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon-wrap">
+                <span data-lucide="globe" style="width:22px;height:22px"></span>
+            </div>
+            <h3>Tracking &amp; Cookies</h3>
+            <p>Usage of persistent, cross-site trackers.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon-wrap">
+                <span data-lucide="share-2" style="width:22px;height:22px"></span>
+            </div>
+            <h3>Data Sharing</h3>
+            <p>Involvement of third-party data brokers.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon-wrap">
+                <span data-lucide="lock" style="width:22px;height:22px"></span>
+            </div>
+            <h3>User Rights</h3>
+            <p>Ability to delete, export, or opt-out.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon-wrap">
+                <span data-lucide="file-text" style="width:22px;height:22px"></span>
+            </div>
+            <h3>Transparency</h3>
+            <p>Clarity and readability of policy terms.</p>
+        </div>
+    </div>
+</div>
+
+<!-- ===== COMMUNITY WATCHLIST ===== -->
+<div class="section" id="watchlistSection">
+    <div class="watchlist-header">
+        <div class="watchlist-header-left">
+            <h2>Community Watchlist</h2>
+            <p>Top searched platforms and their current pulse ratings.</p>
+        </div>
+        <div class="watchlist-header-right">
+            <a href="contributions.html">View Global Index <span>→</span></a>
+        </div>
+    </div>
+    <div class="watchlist-grid">
+        <div class="wl-card" onclick="fillUrl('signal.org')">
+            <div class="wl-card-top">
+                <div class="wl-card-left">
+                    <div class="wl-avatar" style="background:rgba(34,197,94,0.15);color:#22c55e">S</div>
+                    <span class="wl-name">Signal Messenger</span>
+                </div>
+            </div>
+            <div class="wl-card-middle">
+                <div class="wl-ring-wrap">
+                    <svg viewBox="0 0 120 120">
+                        <circle class="wl-ring-bg" cx="60" cy="60" r="50"/>
+                        <circle class="wl-ring-fill" cx="60" cy="60" r="50" stroke="#22c55e" stroke-dasharray="314.16" stroke-dashoffset="25"/>
+                    </svg>
+                    <span class="wl-score" style="color:#22c55e">9.2</span>
+                </div>
+            </div>
+            <div class="wl-card-bottom">
+                <div class="wl-desc">Zero tracking, end-to-end encrypted metadata with no data logs.</div>
+                <div class="wl-badge" style="background:rgba(34,197,94,0.12);color:#22c55e">ELITE PRIVACY</div>
+            </div>
+        </div>
+        <div class="wl-card" onclick="fillUrl('zomato.com')">
+            <div class="wl-card-top">
+                <div class="wl-card-left">
+                    <div class="wl-avatar" style="background:rgba(234,179,8,0.15);color:#eab308">Z</div>
+                    <span class="wl-name">Zomato</span>
+                </div>
+            </div>
+            <div class="wl-card-middle">
+                <div class="wl-ring-wrap">
+                    <svg viewBox="0 0 120 120">
+                        <circle class="wl-ring-bg" cx="60" cy="60" r="50"/>
+                        <circle class="wl-ring-fill" cx="60" cy="60" r="50" stroke="#eab308" stroke-dasharray="314.16" stroke-dashoffset="157"/>
+                    </svg>
+                    <span class="wl-score" style="color:#eab308">5.0</span>
+                </div>
+            </div>
+            <div class="wl-card-bottom">
+                <div class="wl-desc">Heavy location tracking and marketing profiling for ad targeting.</div>
+                <div class="wl-badge" style="background:rgba(234,179,8,0.12);color:#eab308">MODERATE RISK</div>
+            </div>
+        </div>
+        <div class="wl-card" onclick="fillUrl('facebook.com')">
+            <div class="wl-card-top">
+                <div class="wl-card-left">
+                    <div class="wl-avatar" style="background:rgba(239,68,68,0.15);color:#ef4444">F</div>
+                    <span class="wl-name">Facebook</span>
+                </div>
+            </div>
+            <div class="wl-card-middle">
+                <div class="wl-ring-wrap">
+                    <svg viewBox="0 0 120 120">
+                        <circle class="wl-ring-bg" cx="60" cy="60" r="50"/>
+                        <circle class="wl-ring-fill" cx="60" cy="60" r="50" stroke="#ef4444" stroke-dasharray="314.16" stroke-dashoffset="245"/>
+                    </svg>
+                    <span class="wl-score" style="color:#ef4444">2.4</span>
+                </div>
+            </div>
+            <div class="wl-card-bottom">
+                <div class="wl-desc">Extensive cross-site tracking and deep data sharing with partners.</div>
+                <div class="wl-badge" style="background:rgba(239,68,68,0.12);color:#ef4444">HIGH RISK</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== CONTRIBUTION ===== -->
+<div class="section" id="contributeSection" style="display:block;padding-bottom:0">
+    <div class="contribute-grid">
+        <div class="contribute-left">
+            <h2>Help Expand PrivacyPulse</h2>
+            <p>Our bots scan millions of pages, but some privacy policies may be missed. Help improve PrivacyPulse by submitting verified privacy policy links.</p>
+            <div class="contribute-benefits">
+                <div class="benefit">
+                    <span class="check-icon" data-lucide="check" style="width:14px;height:14px"></span>
+                    Community Driven Data
+                </div>
+                <div class="benefit">
+                    <span class="check-icon" data-lucide="check" style="width:14px;height:14px"></span>
+                    Human Verified Analysis
+                </div>
+                <div class="benefit">
+                    <span class="check-icon" data-lucide="check" style="width:14px;height:14px"></span>
+                    Open Transparency Reports
+                </div>
+            </div>
+        </div>
+        <div class="contribute-form-card">
+            <div class="contribute-form" id="contributeForm">
+                <h3 style="font-size:20px;font-weight:700;margin-bottom:8px">Submit a Policy</h3>
+                <div class="form-row">
+                    <div>
+                        <label>DOMAIN NAME</label>
+                        <input type="text" id="contributeDomain" placeholder="e.g. example.com">
+                    </div>
+                    <div>
+                        <label>PRODUCT NAME</label>
+                        <input type="text" id="contributeName" placeholder="e.g. My App">
+                    </div>
+                </div>
+                <div>
+                    <label>POLICY URL</label>
+                    <input type="url" id="contributeUrl" placeholder="https://example.com/privacy">
+                </div>
+                <div>
+                    <label>RAW POLICY TEXT (OPTIONAL)</label>
+                    <textarea id="contributeText" placeholder="Paste the text here for deeper analysis..."></textarea>
+                </div>
+                <button class="contribute-submit" id="contributeSubmit" onclick="submitContribution()">Submit for Analysis</button>
+            </div>
+            <div class="contribute-thanks" id="contributeThanks"></div>
+        </div>
+    </div>
+</div>
+
+</div><!-- /wrapper -->
+
+<!-- ===== FOOTER ===== -->
+<div class="footer">
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <a href="/" class="nav-brand">
+                <div class="nav-brand-icon">🛡️</div>
+                <span class="nav-brand-text">PrivacyPulse</span>
+            </a>
+            <p>Vigilant Protection for the Digital Age. Open-source privacy analytics democratizing data transparency for everyone.</p>
+            <div class="footer-social">
+                <a href="#"><span data-lucide="globe" style="width:16px;height:16px"></span></a>
+                <a href="#"><span data-lucide="github" style="width:16px;height:16px"></span></a>
+            </div>
+        </div>
+        <div class="footer-col">
+            <h4>About PrivacyPulse</h4>
+            <a href="#">Our Mission</a>
+            <a href="#">Scoring Methodology</a>
+            <a href="#">Security &amp; Audit</a>
+        </div>
+        <div class="footer-col">
+            <h4>Community</h4>
+            <a href="contributions.html">Contributions</a>
+            <a href="#">GitHub Repo</a>
+            <a href="#">Discord Channel</a>
+        </div>
+        <div class="footer-col">
+            <h4>Legal</h4>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Cookies Policy</a>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <span>&copy; 2024 PrivacyPulse. All rights reserved.</span>
+        <span class="footer-bottom-right">
+            <span class="footer-status-dot"></span>
+            System Status: <a href="#">Healthy</a> &nbsp;&nbsp; v1.2.0
+        </span>
     </div>
 </div>
 
@@ -797,6 +698,7 @@ h1 { font-size: 22px; text-align: center; margin-bottom: 4px; font-weight: 700; 
 // Suppress third-party extension errors
 window.onerror = function() { return true; };
 window.addEventListener("unhandledrejection", function(e) { e.preventDefault(); });
+
 function scoreColor(n) {
     if (n <= 4) return "#ef4444";
     if (n <= 7) return "#eab308";
@@ -829,18 +731,17 @@ async function scan() {
     const btn = document.getElementById("scanBtn");
     const status = document.getElementById("status");
     const error = document.getElementById("error");
-    const inputCard = document.getElementById("inputCard");
     const scorecard = document.getElementById("scorecard");
-    const empty = document.getElementById("emptyState");
-    const popular = document.querySelector(".popular-section");
+    const scoringSection = document.getElementById("scoringSection");
+    const watchlistSection = document.getElementById("watchlistSection");
+    const contributeSection = document.getElementById("contributeSection");
 
     btn.disabled = true;
+    btn.textContent = "Scanning...";
     status.style.display = "flex";
     error.style.display = "none";
     scorecard.style.display = "none";
     scorecard.classList.remove("card-entrance");
-    empty.style.display = "none";
-    if (popular) popular.style.display = "none";
 
     try {
         const res = await fetch("https://privacy-pulse-w415.onrender.com/scan", {
@@ -860,32 +761,22 @@ async function scan() {
         showError(raw, "Something went wrong. Try again.");
     } finally {
         btn.disabled = false;
+        btn.textContent = "Scan Site";
         status.style.display = "none";
     }
 }
 
 function showError(domain, msg, errorType) {
     const error = document.getElementById("error");
-    const empty = document.getElementById("emptyState");
     const urlDisplay = document.getElementById("errorUrl");
     const msgDisplay = document.getElementById("errorMsg");
-    const emptyUrl = document.getElementById("emptyUrl");
-    const popular = document.querySelector(".popular-section");
     const searched = domain ? "Searched: " + domain : "";
     urlDisplay.textContent = searched;
-    emptyUrl.textContent = searched;
     msgDisplay.textContent = msg;
     error.style.display = "block";
-    empty.style.display = "block";
-    if (popular) popular.style.display = "";
 
-    // Show contribution form for not_found errors
-    const cs = document.getElementById("contributeSection");
     if (errorType === "not_found") {
-        cs.style.display = "block";
         document.getElementById("contributeDomain").value = domain || "";
-    } else {
-        cs.style.display = "none";
     }
 }
 
@@ -939,7 +830,6 @@ function renderScorecard(s) {
     badge.textContent = s.grade || "N/A";
     badge.style.background = scoreColor(s.overall_score || 0);
 
-    // Source badge
     const sb = document.getElementById("sourceBadge");
     const source = s._source || "";
     if (source === "expert") { sb.textContent = "Expert Analysis"; sb.className = "source-badge expert"; sb.style.display = ""; }
@@ -949,10 +839,8 @@ function renderScorecard(s) {
 
     const os = s.overall_score || 0;
     const color = scoreColor(os);
-    const scoreEl = document.getElementById("overallScore");
-    scoreEl.textContent = os + "/10";
-    scoreEl.style.color = color;
-
+    document.getElementById("overallScore").textContent = os + "/10";
+    document.getElementById("overallScore").style.color = color;
     document.getElementById("verdictLine").textContent = s.verdict || "";
 
     const ring = document.getElementById("scoreRing");
@@ -986,12 +874,12 @@ function renderScorecard(s) {
 
     const iconEmoji = os > 6 ? '✅' : os > 3 ? '⚠️' : '🔴';
     document.getElementById("verdictEmoji").textContent = iconEmoji;
-    document.getElementById("verdictEmoji").style.fontSize = "28px";
+    document.getElementById("verdictEmoji").style.fontSize = "30px";
     document.getElementById("verdictText").textContent = s.verdict || "";
 
-    inputCard.style.display = "none";
-    scorecard.style.display = "block";
-    scorecard.classList.add("card-entrance");
+    document.getElementById("inputCard").style.display = "none";
+    document.getElementById("scorecard").style.display = "block";
+    document.getElementById("scorecard").classList.add("card-entrance");
 
     setTimeout(() => {
         document.querySelectorAll(".category-row").forEach((row, i) => {
@@ -1006,6 +894,8 @@ function renderScorecard(s) {
             }, i * 100);
         });
     }, 200);
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function shareScore() {
@@ -1013,7 +903,6 @@ function shareScore() {
     btn.textContent = "Generating...";
     btn.disabled = true;
 
-    // Clone the scorecard into a dark-themed offscreen container
     const original = document.getElementById("captureArea");
     const clone = original.cloneNode(true);
     clone.style.background = "#12141f";
@@ -1064,23 +953,15 @@ function goBack() {
     location.reload();
 }
 
-function showContributeForm() {
-    document.getElementById("contributeBtn").style.display = "none";
-    document.getElementById("contributeForm").style.display = "block";
-}
-
 async function submitContribution() {
     const domain = document.getElementById("contributeDomain").value.trim();
     const policyUrl = document.getElementById("contributeUrl").value.trim();
     const policyText = document.getElementById("contributeText").value.trim();
-    const notes = document.getElementById("contributeNotes").value.trim();
     const contributorName = document.getElementById("contributeName").value.trim();
     const btn = document.getElementById("contributeSubmit");
 
-    if (!policyUrl && !policyText) {
-        alert("Please provide a privacy policy URL, paste the policy text, or both.");
-        return;
-    }
+    if (!domain) { alert("Please enter a domain name."); return; }
+    if (!policyUrl && !policyText) { alert("Please provide a policy URL or paste the policy text."); return; }
 
     btn.disabled = true;
     btn.textContent = "Submitting...";
@@ -1089,7 +970,7 @@ async function submitContribution() {
         const res = await fetch("https://privacy-pulse-w415.onrender.com/contribute", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ domain, policy_url: policyUrl, policy_text: policyText, notes, contributor_name: contributorName })
+            body: JSON.stringify({ domain, policy_url: policyUrl, policy_text: policyText, contributor_name: contributorName })
         });
         const data = await res.json();
         if (data.message) {
@@ -1101,10 +982,10 @@ async function submitContribution() {
             alert(data.error || "Something went wrong.");
         }
     } catch (e) {
-        alert("Network error — check that the backend server is running and try again.");
+        alert("Network error. Try again.");
     } finally {
         btn.disabled = false;
-        btn.textContent = "Submit";
+        btn.textContent = "Submit for Analysis";
     }
 }
 
