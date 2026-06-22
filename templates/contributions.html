@@ -68,6 +68,25 @@ body {
 .filter-btn:hover { border-color: #22c55e; color: #22c55e; }
 .filter-btn.active { background: rgba(34,197,94,0.12); border-color: #22c55e; color: #22c55e; }
 
+.search-name {
+    display: flex; justify-content: center; margin-bottom: 24px; position: relative; z-index: 1;
+}
+.search-name input {
+    width: 100%; max-width: 400px; padding: 12px 16px 12px 40px; font-size: 14px;
+    background: #0a0d16; border: 1.5px solid #27272a; border-radius: 10px;
+    color: #e4e4e7; outline: none; transition: all .3s; font-family: inherit;
+}
+.search-name input:focus { border-color: #22c55e; box-shadow: 0 0 0 3px rgba(34,197,94,0.06); }
+.search-name input::placeholder { color: #52525b; }
+.search-name .search-icon {
+    position: absolute; left: calc(50% - 190px); top: 50%; transform: translateY(-50%);
+    color: #52525b; pointer-events: none;
+}
+@media (max-width: 540px) {
+    .search-name input { max-width: 100%; }
+    .search-name .search-icon { left: 16px; }
+}
+
 /* Table */
 .table-container { width: 100%; padding: 0 40px 40px; position: relative; z-index: 1; }
 .table-scroll { overflow-x: auto; }
@@ -140,12 +159,13 @@ td.date { color: #63637a; font-size: 13px; }
             <div class="nav-brand-icon">🛡️</div>
             <span class="nav-brand-text">PrivacyPulse</span>
         </a>
-        <div class="nav-center">
-            <a href="index.html" class="nav-link">Home</a>
-            <a href="index.html#watchlistSection" class="nav-link">Privacy Reports</a>
-            <a href="index.html#contributeSection" class="nav-link">Contribution</a>
-            <a href="contributions.html" class="nav-link active">Community</a>
-        </div>
+            <div class="nav-center">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="index.html#scoringSection" class="nav-link">About</a>
+                <a href="index.html#watchlistSection" class="nav-link">Privacy Reports</a>
+                <a href="index.html#contributeSection" class="nav-link">Contribution</a>
+                <a href="contributions.html" class="nav-link active">Community</a>
+            </div>
     </div>
 </nav>
 
@@ -159,6 +179,11 @@ td.date { color: #63637a; font-size: 13px; }
     <button class="filter-btn" data-filter="pending" onclick="filterContributions('pending')">Pending</button>
     <button class="filter-btn" data-filter="approved" onclick="filterContributions('approved')">Approved</button>
     <button class="filter-btn" data-filter="rejected" onclick="filterContributions('rejected')">Rejected</button>
+</div>
+
+<div class="search-name">
+    <span class="search-icon" style="width:18px;height:18px">🔍</span>
+    <input type="text" id="nameSearch" placeholder="Search by your name..." oninput="filterByName()">
 </div>
 
 <div class="table-container">
