@@ -571,6 +571,10 @@ def contributions_page():
 def privacy_policy_page():
     return render_template("privacy-policy.html")
 
+@app.route("/terms-of-service")
+def terms_of_service_page():
+    return render_template("terms-of-service.html")
+
 @app.route("/contribute", methods=["POST"])
 def contribute():
     data = request.json or {}
