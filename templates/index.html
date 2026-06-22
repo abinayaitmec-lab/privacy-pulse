@@ -49,13 +49,18 @@ body {
     font-size: 16px; font-weight: 700;
 }
 .nav-brand-text { font-size: 18px; font-weight: 800; color: #e4e4e7; letter-spacing: -0.5px; }
-.nav-center { display: flex; gap: 2px; }
+.nav-center { display: flex; gap: 2px; position: relative; }
 .nav-link {
     padding: 8px 18px; border-radius: 8px; text-decoration: none;
-    font-size: 14px; font-weight: 500; color: #63637a; transition: all .2s;
+    font-size: 14px; font-weight: 500; color: #63637a; transition: color .3s;
+    position: relative; z-index: 1;
 }
-.nav-link:hover { color: #e4e4e7; background: rgba(255,255,255,0.04); }
-.nav-link.active { color: #22c55e; background: rgba(34,197,94,0.08); }
+.nav-link:hover { color: #e4e4e7; }
+.nav-indicator {
+    position: absolute; top: 0; height: 100%; border-radius: 8px;
+    background: rgba(34,197,94,0.08); transition: left .3s cubic-bezier(0.34, 1.56, 0.64, 1), width .3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 0;
+}
 .nav-signin {
     padding: 8px 20px; background: linear-gradient(135deg, #22c55e, #16a34a);
     border: none; border-radius: 8px; color: #000; font-size: 13px; font-weight: 700;
@@ -160,6 +165,25 @@ body {
 }
 .feature-card h3 { font-size: 14px; font-weight: 700; margin-bottom: 8px; color: #e4e4e7; }
 .feature-card p { font-size: 13px; color: #63637a; line-height: 1.5; }
+
+/* ===== ABOUT ===== */
+.about-desc { text-align: center; max-width: 700px; margin: 0 auto 40px; position: relative; z-index: 1; }
+.about-desc p { color: #71717a; font-size: 15px; line-height: 1.7; }
+.about-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; position: relative; z-index: 1; }
+.about-card {
+    background: linear-gradient(145deg, #12141f, #0e101a);
+    border: 1px solid rgba(255,255,255,0.04);
+    border-radius: 16px; padding: 28px 20px;
+    transition: all .3s; cursor: default;
+}
+.about-card:hover { transform: translateY(-4px); border-color: rgba(34,197,94,0.15); box-shadow: 0 12px 32px rgba(0,0,0,0.3); }
+.about-icon-wrap {
+    width: 48px; height: 48px; border-radius: 12px; border: 1px solid;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 16px;
+}
+.about-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; color: #e4e4e7; }
+.about-card p { font-size: 13px; color: #63637a; line-height: 1.5; }
 
 /* ===== COMMUNITY WATCHLIST ===== */
 .watchlist-header {
@@ -341,6 +365,7 @@ body {
 /* ===== RESPONSIVE ===== */
 @media (max-width: 1024px) {
     .feature-grid { grid-template-columns: repeat(3, 1fr); }
+    .about-grid { grid-template-columns: repeat(2, 1fr); }
     .footer-inner { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 768px) {
@@ -352,6 +377,7 @@ body {
     .search-input-group .search-icon { display: none; }
     .search-btn { width: 100%; justify-content: center; }
     .feature-grid { grid-template-columns: repeat(2, 1fr); }
+    .about-grid { grid-template-columns: 1fr; }
     .watchlist-grid { grid-template-columns: 1fr; }
     .contribute-grid { grid-template-columns: 1fr; gap: 32px; }
     .navbar { padding: 0 20px; }
@@ -395,10 +421,12 @@ body {
             <span class="nav-brand-text">PrivacyPulse</span>
         </a>
         <div class="nav-center">
-            <a href="/" class="nav-link active">Home</a>
-            <a href="#watchlistSection" class="nav-link">Privacy Reports</a>
-            <a href="#contributeSection" class="nav-link">Contribution</a>
+            <a href="#inputCard" class="nav-link active" data-section="inputCard">Home</a>
+            <a href="#scoringSection" class="nav-link" data-section="scoringSection">About</a>
+            <a href="#watchlistSection" class="nav-link" data-section="watchlistSection">Privacy Reports</a>
+            <a href="#contributeSection" class="nav-link" data-section="contributeSection">Contribution</a>
             <a href="contributions.html" class="nav-link">Community</a>
+            <div class="nav-indicator" id="navIndicator"></div>
         </div>
     </div>
 </nav>
@@ -518,6 +546,47 @@ body {
             </div>
             <h3>Transparency</h3>
             <p>Clarity and readability of policy terms.</p>
+        </div>
+    </div>
+</div>
+
+<!-- ===== ABOUT ===== -->
+<div class="section" id="aboutSection">
+    <div class="section-header">
+        <h2>About PrivacyPulse</h2>
+        <p style="max-width:600px;margin:8px auto 0">Helping people understand how websites collect, use, share, and protect personal data.</p>
+    </div>
+    <div class="about-desc">
+        <p>PrivacyPulse transforms complex privacy policies into simple privacy insights. Instead of reading lengthy legal documents, users can quickly understand a website's privacy practices through transparent scoring and evidence-based analysis.</p>
+    </div>
+    <div class="about-grid">
+        <div class="about-card">
+            <div class="about-icon-wrap" style="background:rgba(239,68,68,0.08);border-color:rgba(239,68,68,0.12);color:#ef4444">
+                <span data-lucide="heart" style="width:22px;height:22px"></span>
+            </div>
+            <h3>Our Mission</h3>
+            <p>Make privacy information accessible, transparent, and understandable for everyone.</p>
+        </div>
+        <div class="about-card">
+            <div class="about-icon-wrap" style="background:rgba(34,197,94,0.08);border-color:rgba(34,197,94,0.12);color:#22c55e">
+                <span data-lucide="scan-search" style="width:22px;height:22px"></span>
+            </div>
+            <h3>How We Analyze</h3>
+            <p>Evaluate websites across data collection, tracking, data sharing, user rights, and transparency.</p>
+        </div>
+        <div class="about-card">
+            <div class="about-icon-wrap" style="background:rgba(139,92,246,0.08);border-color:rgba(139,92,246,0.12);color:#a78bfa">
+                <span data-lucide="users" style="width:22px;height:22px"></span>
+            </div>
+            <h3>Community Powered</h3>
+            <p>Community contributions help us improve and discover privacy policies that automated systems miss.</p>
+        </div>
+        <div class="about-card">
+            <div class="about-icon-wrap" style="background:rgba(59,130,246,0.08);border-color:rgba(59,130,246,0.12);color:#60a5fa">
+                <span data-lucide="eye" style="width:22px;height:22px"></span>
+            </div>
+            <h3>Transparency First</h3>
+            <p>Every privacy score is backed by evidence making our analysis publicly visible findings.</p>
         </div>
     </div>
 </div>
@@ -871,6 +940,7 @@ function renderScorecard(s) {
 
     document.getElementById("inputCard").style.display = "none";
     document.getElementById("scoringSection").style.display = "none";
+    document.getElementById("aboutSection").style.display = "none";
     document.getElementById("watchlistSection").style.display = "none";
     document.getElementById("contributeSection").style.display = "none";
     document.getElementById("scorecard").style.display = "block";
@@ -987,6 +1057,60 @@ async function submitContribution() {
 
 document.getElementById("urlInput").addEventListener("keydown", e => {
     if (e.key === "Enter") scan();
+});
+
+// Smooth tab indicator
+function moveIndicator(el) {
+    const indicator = document.getElementById("navIndicator");
+    if (!indicator || !el) return;
+    const center = document.querySelector(".nav-center");
+    const cr = center.getBoundingClientRect();
+    const lr = el.getBoundingClientRect();
+    indicator.style.left = (lr.left - cr.left) + "px";
+    indicator.style.width = lr.width + "px";
+}
+
+function setActiveNav(id) {
+    document.querySelectorAll(".nav-center .nav-link").forEach(link => {
+        const sec = link.getAttribute("data-section");
+        if (sec === id) {
+            link.style.color = "#22c55e";
+            moveIndicator(link);
+        } else {
+            link.style.color = "";
+        }
+    });
+}
+
+// On load, position indicator on active link
+window.addEventListener("load", () => {
+    const active = document.querySelector(".nav-center .nav-link.active");
+    if (active) moveIndicator(active);
+});
+
+// Scroll-based active tab highlighting
+const sections = ["inputCard", "scoringSection", "watchlistSection", "contributeSection"];
+window.addEventListener("scroll", () => {
+    const scrollY = window.scrollY + 120;
+    let current = "inputCard";
+    for (const id of sections) {
+        const el = document.getElementById(id);
+        if (el && el.offsetTop <= scrollY) current = id;
+    }
+    setActiveNav(current);
+}, { passive: true });
+
+// Click-based smooth navigation
+document.querySelectorAll(".nav-center .nav-link[data-section]").forEach(link => {
+    link.addEventListener("click", e => {
+        e.preventDefault();
+        const id = link.getAttribute("data-section");
+        const el = document.getElementById(id);
+        if (el) {
+            el.scrollIntoView({ behavior: "smooth" });
+            setActiveNav(id);
+        }
+    });
 });
 
 if (window.lucide) lucide.createIcons();
