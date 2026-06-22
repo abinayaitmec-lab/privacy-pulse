@@ -1,6 +1,6 @@
 import os, re, json, requests, cloudscraper, traceback, time, socket
 from urllib.parse import urlparse
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_from_directory
 from bs4 import BeautifulSoup
 from html2text import HTML2Text
 from groq import Groq
@@ -558,6 +558,11 @@ def fetch_contributions():
         return resp.data or []
     except Exception:
         return []
+
+
+@app.route("/favicon.svg")
+def favicon():
+    return send_from_directory(".", "favicon.svg", mimetype="image/svg+xml")
 
 @app.route("/")
 def health():
