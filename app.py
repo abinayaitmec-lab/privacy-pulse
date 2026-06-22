@@ -567,6 +567,10 @@ def health():
 def contributions_page():
     return render_template("contributions.html")
 
+@app.route("/privacy-policy")
+def privacy_policy_page():
+    return render_template("privacy-policy.html")
+
 @app.route("/contribute", methods=["POST"])
 def contribute():
     data = request.json or {}
