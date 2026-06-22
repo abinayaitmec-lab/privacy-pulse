@@ -190,6 +190,7 @@ td.date { color: #63637a; font-size: 13px; }
     <div class="loading" id="loading">
         <div class="loading-bar"><div class="loading-bar-fill"></div></div>
         <span>Loading contributions...</span>
+        <span class="timer-msg" style="color:#52525b;font-size:12px;margin-top:4px">First visit? Server may take a moment to wake up.</span>
     </div>
 
     <div class="table-scroll">
@@ -216,10 +217,31 @@ td.date { color: #63637a; font-size: 13px; }
 
 <script>
 const API = "https://privacy-pulse-w415.onrender.com/api/contributions";
+let loadTimer;
+let seconds = 0;
+
+function startTimer() {
+    seconds = 0;
+    const el = document.getElementById("loading");
+    loadTimer = setInterval(() => {
+        seconds++;
+        const msg = el.querySelector(".timer-msg");
+        if (msg) msg.textContent = `Waiting ${seconds}s...`;
+    }, 1000);
+}
+
+function stopTimer() {
+    clearInterval(loadTimer);
+}
 
 async function loadContributions() {
+    startTimer();
     try {
-        const res = await fetch(API);
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 60000);
+        const res = await fetch(API, { signal: controller.signal });
+        clearTimeout(timeout);
+        stopTimer();
         const data = await res.json();
         const items = data.contributions || [];
         document.getElementById("loading").style.display = "none";
@@ -235,7 +257,8 @@ async function loadContributions() {
         window._allItems = items;
         renderRows(items);
     } catch (e) {
-        document.getElementById("loading").innerHTML = '<span>Failed to load contributions.</span>';
+        stopTimer();
+        document.getElementById("loading").innerHTML = '<span>Failed to load contributions.</span><span style="color:#52525b;font-size:12px;margin-top:4px">Server may be waking up. Try refreshing in a minute.</span>';
     }
 }
 
