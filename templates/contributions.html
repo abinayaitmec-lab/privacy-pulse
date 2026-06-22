@@ -190,7 +190,6 @@ td.date { color: #63637a; font-size: 13px; }
     <div class="loading" id="loading">
         <div class="loading-bar"><div class="loading-bar-fill"></div></div>
         <span>Loading contributions...</span>
-        <span class="timer-msg" style="color:#52525b;font-size:12px;margin-top:4px">First visit? Server may take a moment to wake up.</span>
     </div>
 
     <div class="table-scroll">
@@ -216,37 +215,22 @@ td.date { color: #63637a; font-size: 13px; }
 <div class="footer">&copy; 2026 PrivacyPulse — Free privacy checker</div>
 
 <script>
-const API = "https://privacy-pulse-w415.onrender.com/api/contributions";
-let loadTimer;
-let seconds = 0;
-
-function startTimer() {
-    seconds = 0;
-    const el = document.getElementById("loading");
-    loadTimer = setInterval(() => {
-        seconds++;
-        const msg = el.querySelector(".timer-msg");
-        if (msg) msg.textContent = `Waiting ${seconds}s...`;
-    }, 1000);
-}
-
-function stopTimer() {
-    clearInterval(loadTimer);
-}
+const SUPABASE_URL = "https://iebxzeqmpuvrbyutknvp.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllYnh6ZXFtcHV2cmJ5dXRrbnZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4NTk2NDQsImV4cCI6MjA5NzQzNTY0NH0.Kd1zUltJ8JgFrkhqFRcY57C6waR4MjGmSm8KRXsPWpc";
+const TABLE = "pending_contributions";
 
 async function loadContributions() {
-    startTimer();
     try {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 60000);
-        const res = await fetch(API, { signal: controller.signal });
-        clearTimeout(timeout);
-        stopTimer();
-        const data = await res.json();
-        const items = data.contributions || [];
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?select=domain,contributor_name,status,submitted_at&order=submitted_at.desc`, {
+            headers: {
+                "apikey": SUPABASE_KEY,
+                "Authorization": `Bearer ${SUPABASE_KEY}`
+            }
+        });
+        const items = await res.json();
         document.getElementById("loading").style.display = "none";
 
-        if (items.length === 0) {
+        if (!items || items.length === 0) {
             document.getElementById("emptyState").style.display = "block";
             return;
         }
@@ -257,8 +241,7 @@ async function loadContributions() {
         window._allItems = items;
         renderRows(items);
     } catch (e) {
-        stopTimer();
-        document.getElementById("loading").innerHTML = '<span>Failed to load contributions.</span><span style="color:#52525b;font-size:12px;margin-top:4px">Server may be waking up. Try refreshing in a minute.</span>';
+        document.getElementById("loading").innerHTML = '<span>Failed to load contributions.</span>';
     }
 }
 
